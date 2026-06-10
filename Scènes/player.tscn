@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://1xygtj03otne"]
+
+[ext_resource type="Script" uid="uid://c5qonyk37tagj" path="res://Scripts/Player.gd" id="1_c544a"]
+[ext_resource type="Texture2D" uid="uid://bh5rhv4gjd5tg" path="res://Sprite/Platformer Hero FREE Version-Idle.png" id="2_c544a"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_c544a"]
+radius = 15.0
+height = 52.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c544a"]
+atlas = ExtResource("2_c544a")
+region = Rect2(0, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_16m8m"]
+atlas = ExtResource("2_c544a")
+region = Rect2(48, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5arnv"]
+atlas = ExtResource("2_c544a")
+region = Rect2(96, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wss7u"]
+atlas = ExtResource("2_c544a")
+region = Rect2(144, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cucgj"]
+atlas = ExtResource("2_c544a")
+region = Rect2(192, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_anahk"]
+atlas = ExtResource("2_c544a")
+region = Rect2(240, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3idgr"]
+atlas = ExtResource("2_c544a")
+region = Rect2(288, 20, 48, 28)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ugyn4"]
+atlas = ExtResource("2_c544a")
+region = Rect2(336, 20, 48, 28)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_caakp"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c544a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_16m8m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5arnv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wss7u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cucgj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_anahk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3idgr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ugyn4")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="Player" type="CharacterBody2D" unique_id=557671400]
+script = ExtResource("1_c544a")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1603531983]
+shape = SubResource("CapsuleShape2D_c544a")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=443572277]
+position = Vector2(0, 23)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("SpriteFrames_caakp")
+animation = &"idle"
+frame_progress = 0.0010926856
+offset = Vector2(-8, -12)
