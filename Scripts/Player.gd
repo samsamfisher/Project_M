@@ -74,6 +74,7 @@ func _physics_process(delta: float) -> void:
 	if direction != 0:
 		var accel := acceleration if is_on_floor() else air_acceleration
 		velocity.x = move_toward(velocity.x, direction * max_speed, accel * delta)
+		$AnimatedSprite2D.play("run")
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 
