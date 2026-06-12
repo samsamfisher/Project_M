@@ -13,10 +13,11 @@ extends CharacterBody2D
 @export var air_acceleration: float = 1500.0 # contrôle dans les airs (un peu moins qu'au sol)
 
 # --- Saut ---
-@export var jump_velocity: float = -450.0   # négatif car l'axe Y pointe vers le bas
+@export var jump_velocity: float = -450.0    # négatif car l'axe Y pointe vers le bas
 @export var jump_cut_multiplier: float = 0.4 # saut variable : on coupe l'élan si on relâche tôt
-@export var coyote_time: float = 0.1        # délai de grâce après avoir quitté le sol (s)
-@export var jump_buffer_time: float = 0.1   # mémorise un appui saut juste avant d'atterrir (s)
+@export var coyote_time: float = 0.1         # délai de grâce après avoir quitté le sol (s)
+@export var jump_buffer_time: float = 0.1    # mémorise un appui saut juste avant d'atterrir (s)
+@export var double_saut: bool = false        # passe à True si on peut éxecuter un Double Saut
 
 # --- Gravité asymétrique ---
 @export var gravity_up: float = 1200.0      # quand on monte
@@ -43,9 +44,12 @@ func _physics_process(delta: float) -> void:
 	jump_buffer_timer -= delta
 	dash_cooldown_timer -= delta
 
+
 	# Tant qu'on est au sol, on recharge le coyote time
 	if is_on_floor():
 		coyote_timer = coyote_time
+		double_saut = true
+
 
 	# --- Lecture de la direction ---
 	var direction := Input.get_axis("move_left", "move_right")
@@ -56,6 +60,8 @@ func _physics_process(delta: float) -> void:
 			sprite.flip_h = facing < 0
 	else :
 		$AnimatedSprite2D.play("idle")
+		
+		
 	# --- DASH ---
 	# Pendant un dash : vitesse fixe, pas de gravité, on ignore le reste.
 	if is_dashing:
@@ -65,10 +71,12 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
+
 	# Déclenchement du dash
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0:
 		start_dash()
 		return
+
 
 	# --- Déplacement horizontal (accélération / friction) ---
 	if direction != 0:
@@ -78,20 +86,28 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 
+
 	# --- Gravité (asymétrique) ---
 	if not is_on_floor():
 		var g := gravity_up if velocity.y < 0 else gravity_down
 		velocity.y += g * delta
+		
+
 
 	# --- Jump buffer : on mémorise l'appui ---
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_time
+
 
 	# --- Saut : possible si on a un appui en mémoire ET du coyote time ---
 	if jump_buffer_timer > 0 and coyote_timer > 0:
 		velocity.y = jump_velocity
 		jump_buffer_timer = 0
 		coyote_timer = 0
+		
+	if not is_on_floor() and double_saut == true and Input.is_action_just_pressed("jump"):
+		velocity.y = jump_velocity
+		double_saut = false
 
 	# --- Saut variable : relâcher tôt = saut plus court ---
 	if Input.is_action_just_released("jump") and velocity.y < 0:
