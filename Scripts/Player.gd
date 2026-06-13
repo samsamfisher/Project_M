@@ -58,10 +58,8 @@ func _physics_process(delta: float) -> void:
 		# Oriente le sprite (commente ces 2 lignes si tu n'as pas encore de sprite)
 		if sprite:
 			sprite.flip_h = facing < 0
-	else :
-		$AnimatedSprite2D.play("idle")
 		
-		
+	
 	# --- DASH ---
 	# Pendant un dash : vitesse fixe, pas de gravité, on ignore le reste.
 	if is_dashing:
@@ -82,16 +80,14 @@ func _physics_process(delta: float) -> void:
 	if direction != 0:
 		var accel := acceleration if is_on_floor() else air_acceleration
 		velocity.x = move_toward(velocity.x, direction * max_speed, accel * delta)
-		$AnimatedSprite2D.play("run")
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
-
+		
 
 	# --- Gravité (asymétrique) ---
 	if not is_on_floor():
 		var g := gravity_up if velocity.y < 0 else gravity_down
 		velocity.y += g * delta
-		
 
 
 	# --- Jump buffer : on mémorise l'appui ---
@@ -105,9 +101,11 @@ func _physics_process(delta: float) -> void:
 		jump_buffer_timer = 0
 		coyote_timer = 0
 		
+	# --- Double saut ---	
 	if not is_on_floor() and double_saut == true and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 		double_saut = false
+
 
 	# --- Saut variable : relâcher tôt = saut plus court ---
 	if Input.is_action_just_released("jump") and velocity.y < 0:
@@ -115,6 +113,15 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 
+	if not is_on_floor() and velocity.y < 0:
+		sprite.play("jump")
+	elif not is_on_floor() and velocity.y >= 0:
+		sprite.play("fall")
+	elif is_on_floor() and velocity.x != 0:
+		sprite.play("run")
+	else:
+		sprite.play("idle")
+	
 
 func start_dash() -> void:
 	is_dashing = true
