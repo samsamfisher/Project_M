@@ -152,3 +152,6 @@ sprite_frames = SubResource("SpriteFrames_caakp")
 animation = &"run"
 frame_progress = 0.29557478
 offset = Vector2(-8, -12)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1939019897]
+position_smoothing_enabled = true
