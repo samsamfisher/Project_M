@@ -1,9 +1,7 @@
 extends CharacterBody2D
 
 # =========================================================
-#  CONTRÔLEUR DE DÉPLACEMENT — Plateformer 2D (Godot 4)
-#  Toutes les valeurs @export sont réglables dans l'éditeur.
-#  Joue avec elles pour trouver TON feeling.
+#  CONTRÔLEUR DE DÉPLACEMENT
 # =========================================================
 
 # --- Déplacement horizontal ---
@@ -48,7 +46,7 @@ func _physics_process(delta: float) -> void:
 	# Tant qu'on est au sol, on recharge le coyote time
 	if is_on_floor():
 		coyote_timer = coyote_time
-		double_saut = true
+		#double_saut = true
 
 
 	# --- Lecture de la direction ---
@@ -100,11 +98,13 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		jump_buffer_timer = 0
 		coyote_timer = 0
-		
+		double_saut = true
 	# --- Double saut ---	
-	if not is_on_floor() and double_saut == true and Input.is_action_just_pressed("jump"):
+	elif not is_on_floor() and double_saut == true and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 		double_saut = false
+		
+
 
 
 	# --- Saut variable : relâcher tôt = saut plus court ---
