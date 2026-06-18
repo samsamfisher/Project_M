@@ -17,9 +17,13 @@ config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=980
+window/size/viewport_width=1200
+window/size/viewport_height=800
 window/stretch/mode="viewport"
+
+[global_group]
+
+Player="Groupe du Player"
 
 [input]
 

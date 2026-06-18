@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bd5kpwso11nti"
-path="res://.godot/imported/Platformer Hero FREE Version-Fall.png-882555651c8ed8d750587ea6a97edb85.ctex"
+uid="uid://cb3jdvfr5ftvi"
+path="res://.godot/imported/Platformer Hero FREE Version-Land.png-b725a6ff40b179aaeac7677959a5e5bb.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Platformer Hero FREE Version-Fall.png"
-dest_files=["res://.godot/imported/Platformer Hero FREE Version-Fall.png-882555651c8ed8d750587ea6a97edb85.ctex"]
+source_file="res://Sprite/Hero/Platformer Hero FREE Version-Land.png"
+dest_files=["res://.godot/imported/Platformer Hero FREE Version-Land.png-b725a6ff40b179aaeac7677959a5e5bb.ctex"]
 
 [params]
 

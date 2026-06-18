@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bh5rhv4gjd5tg"
-path="res://.godot/imported/Platformer Hero FREE Version-Idle.png-084a8d9112590d20968d0802043c8c5c.ctex"
+uid="uid://diksxlxousx7g"
+path="res://.godot/imported/16x16 spritesheet.png-89bc761a1296193ef95bd4b8b3af1d86.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Platformer Hero FREE Version-Idle.png"
-dest_files=["res://.godot/imported/Platformer Hero FREE Version-Idle.png-084a8d9112590d20968d0802043c8c5c.ctex"]
+source_file="res://Sprite/TileSet/16x16 spritesheet.png"
+dest_files=["res://.godot/imported/16x16 spritesheet.png-89bc761a1296193ef95bd4b8b3af1d86.ctex"]
 
 [params]
 

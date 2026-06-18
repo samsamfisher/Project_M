@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ffpfq0dsfb8q"
-path="res://.godot/imported/Platformer Hero FREE Version-Run.png-7d7cb106d9893666c0ef3a25ae70da06.ctex"
+uid="uid://c7n74s8l7wbuh"
+path="res://.godot/imported/Platformer Hero FREE Version-Jump.png-26b9186861948c6142131d28bec0e5af.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Sprite/Platformer Hero FREE Version-Run.png"
-dest_files=["res://.godot/imported/Platformer Hero FREE Version-Run.png-7d7cb106d9893666c0ef3a25ae70da06.ctex"]
+source_file="res://Sprite/Hero/Platformer Hero FREE Version-Jump.png"
+dest_files=["res://.godot/imported/Platformer Hero FREE Version-Jump.png-26b9186861948c6142131d28bec0e5af.ctex"]
 
 [params]
 

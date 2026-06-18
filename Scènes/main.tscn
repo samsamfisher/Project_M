@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://1xygtj03otne" path="res://Scènes/player.tscn" id="1_mijtf"]
 [ext_resource type="PackedScene" uid="uid://dijri8wkvh4oi" path="res://Scènes/level.tscn" id="2_24a1y"]
+[ext_resource type="PackedScene" uid="uid://djvqktoe64xsu" path="res://Scènes/ressources.tscn" id="3_ahwsu"]
 
 [node name="Main" type="Node2D" unique_id=1805071930]
 
@@ -9,3 +10,40 @@
 
 [node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
 position = Vector2(348, 816)
+
+[node name="Ressources" parent="." unique_id=1239007027 instance=ExtResource("3_ahwsu")]
+position = Vector2(2216, 402)
+
+[node name="Ressources3" parent="." unique_id=1503463868 instance=ExtResource("3_ahwsu")]
+position = Vector2(6596, 311)
+
+[node name="Ressources4" parent="." unique_id=158801811 instance=ExtResource("3_ahwsu")]
+position = Vector2(8385, 640)
+
+[node name="Ressources5" parent="." unique_id=938920630 instance=ExtResource("3_ahwsu")]
+position = Vector2(12264, 858)
+
+[node name="Ressources7" parent="." unique_id=1346182411 instance=ExtResource("3_ahwsu")]
+position = Vector2(13886, 573)
+
+[node name="Ressources8" parent="." unique_id=985177910 instance=ExtResource("3_ahwsu")]
+position = Vector2(15625, 546)
+
+[node name="Ressources6" parent="." unique_id=1233078947 instance=ExtResource("3_ahwsu")]
+position = Vector2(2743, 803)
+
+[node name="UserInterface" type="Control" parent="." unique_id=471166282]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 264.0
+offset_top = 454.0
+offset_right = 304.0
+offset_bottom = 494.0
+
+[node name="ScoreLabel" type="Label" parent="UserInterface" unique_id=1245923893]
+layout_mode = 0
+offset_left = 45.0
+offset_top = 24.0
+offset_right = 85.0
+offset_bottom = 47.0
+text = "0"
