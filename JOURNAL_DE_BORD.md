@@ -363,3 +363,54 @@ elif not is_on_floor() and double_saut == true and Input.is_action_just_pressed(
 - **Prochain cap :** à définir ensemble (probable : peaufiner le niveau / commencer à y placer les premiers éléments de la boucle de jeu).
 
 > _Prochaine entrée à écrire à la fin du prochain mini-sprint._
+
+
+## Sprint — Son au ramassage
+**Branche :** `feat/son` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Quand on ramasse une ressource, un petit *« pop »* se joue. Le son passe par un **autoload dédié** (`Sound`) qui possède son propre lecteur, déclenché en direct depuis le script de la ressource.
+
+### 🔧 Comment ça marche
+
+**Le modèle mental (le vrai « pourquoi ») :** la ressource est *éphémère* — elle fait `queue_free()` dès qu'on la touche. Si le lecteur de son vivait sur elle, il mourrait avec elle → **son coupé net**. Donc le son a besoin d'un **hôte qui survit**. D'où l'autoload `Sound` (global, jamais détruit). Un job par autoload : `Stats` tient les chiffres, `Sound` fait le bruit.
+
+**L'autoload fabrique son lecteur en code :**
+```gdscript
+# sound.gd  (autoload "Sound")
+extends Node
+
+var player: AudioStreamPlayer
+
+func _ready() -> void:
+	player = AudioStreamPlayer.new()                  # fabrique le lecteur (orphelin en mémoire)
+	player.stream = preload("res://Sound/pop.wav")    # lui donne un son
+	add_child(player)                                 # le branche dans l'arbre → il peut jouer
+
+func _playSound() -> void:
+	player.play()
+```
+
+**Le point clé — pourquoi `add_child` :** `.new()` crée bien l'objet, mais il flotte tout seul, *débranché*. Un nœud ne « vit » (et l'audio ne sort) **que s'il est dans l'arbre de la scène**. `add_child` le branche sur la prise. C'est le **miroir** du piège de `queue_free` : sortir de l'arbre = mort ; entrer dans l'arbre = vivant. **Seuls les nœuds dans l'arbre sont actifs.**
+
+**Le déclenchement — appel direct :**
+```gdscript
+# ressources.gd
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		Stats.ajouter_ressource()
+		Sound._playSound()        # appel direct à un service global, comme Stats
+		queue_free()
+```
+Pas besoin de signal ici : un signal sert quand l'émetteur ne doit *pas* connaître qui écoute. `Sound` est un service global connu — l'appeler par son nom est plus simple et plus clair.
+
+### 🏷️ Concepts / mots-clés
+autoload dédié (un job par boîte) · `AudioStreamPlayer` · `.new()` vs `add_child()` · arbre de la scène (`SceneTree`) · nœud orphelin · `preload` · `queue_free()` · appel direct vs signal · service global
+
+### 🪤 Pièges / à surveiller
+- **Son sur la ressource + `queue_free()`** → son coupé. L'hôte du son doit survivre à la ressource.
+- **`.new()` seul = orphelin muet.** Sans `add_child`, le `play()` ne sort rien (et si on oublie carrément le lecteur, erreur *« call 'play' on a null instance »*).
+- **`AudioStreamPlayer2D` dans un autoload** = son *positionnel*, peut rester inaudible. Pour un SFX de ramassage/UI, prendre `AudioStreamPlayer` tout court.
+- **Ne pas brancher le pop sur le signal `ressources_changees`** : ce signal part à *chaque* changement du total — donc aussi quand on **dépensera** à la boutique → le son sonnerait au mauvais moment. L'appel direct colle le son pile à l'événement « ramassage ».
+- **Garder `_on_area_2d_body_entered` propre** : aujourd'hui 2 réactions (`Stats` + `Sound`), ça va. Quand elles se multiplient (particules, score, succès…) → basculer sur un signal « ramassé » que tout le monde écoute.
+- **À nettoyer un jour (warnings ⚠) :** `$AnimatedSprite2D.play("icon")` dans `_process` tourne à chaque frame (le mettre dans `_ready`), et le `delta` de `_process` n'est pas utilisé.
