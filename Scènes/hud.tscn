@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://b46j3mg31oo7v"]
+
+[ext_resource type="PackedScene" uid="uid://bthqhukbrfc80" path="res://Scènes/score.tscn" id="1_37p78"]
+[ext_resource type="PackedScene" uid="uid://c4s7b5p4pemu7" path="res://Scènes/jauge_menace.tscn" id="2_7yc4i"]
+
+[node name="HUD" type="CanvasLayer" unique_id=1241412000]
+
+[node name="Score" parent="." unique_id=637433192 instance=ExtResource("1_37p78")]
+
+[node name="JaugeMenace" parent="." unique_id=908032383 instance=ExtResource("2_7yc4i")]

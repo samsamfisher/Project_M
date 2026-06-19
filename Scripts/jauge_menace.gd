@@ -1,4 +1,6 @@
-extends Node2D
+extends Control
+
+@export var value_max_jauge : float = 90
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -7,12 +9,5 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	$AnimatedSprite2D.play("icon")
-
-
-
-func _on_area_2d_body_entered(body: Node2D) -> void:
-	if body.is_in_group("Player"):
-		Stats.ajouter_ressource()
-		Sound._playSound()
-		queue_free()
+	$ProgressBar.value = Stats.time
+	$ProgressBar.max_value = value_max_jauge

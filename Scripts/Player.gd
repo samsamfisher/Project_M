@@ -36,8 +36,6 @@ var facing: int = 1   # 1 = droite, -1 = gauche
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 
-signal a_saute
-
 func _physics_process(delta: float) -> void:
 	# --- On fait avancer tous les timers ---
 	coyote_timer -= delta
