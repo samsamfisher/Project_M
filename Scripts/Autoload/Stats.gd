@@ -5,6 +5,7 @@ var ressources: int = 0
 var time : float = 0
 signal ressources_changees(total: int)   # déclarer
 
+
 func _process(delta: float) -> void:
 	time += facteur_speed_jauge * delta
 	

@@ -7,8 +7,8 @@
 [ext_resource type="Texture2D" uid="uid://c7n74s8l7wbuh" path="res://Sprite/Hero/Platformer Hero FREE Version-Jump.png" id="5_cucgj"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_c544a"]
-radius = 15.0
-height = 52.0
+radius = 9.0
+height = 26.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ajod8"]
 atlas = ExtResource("2_wss7u")
@@ -202,6 +202,7 @@ animations = [{
 }]
 
 [node name="Player" type="CharacterBody2D" unique_id=557671400 groups=["Player"]]
+scale = Vector2(2, 2)
 script = ExtResource("1_c544a")
 max_speed = 500.0
 acceleration = 1800.0
@@ -217,11 +218,10 @@ dash_cooldown = 2.0
 shape = SubResource("CapsuleShape2D_c544a")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=443572277]
-position = Vector2(9, 2)
-scale = Vector2(2, 2)
+position = Vector2(7, 2)
 sprite_frames = SubResource("SpriteFrames_caakp")
 animation = &"idle"
-frame_progress = 0.47376478
+frame_progress = 0.8367286
 offset = Vector2(-8, -12)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1939019897]

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dijri8wkvh4oi" path="res://Scènes/level.tscn" id="2_24a1y"]
 [ext_resource type="PackedScene" uid="uid://djvqktoe64xsu" path="res://Scènes/ressources.tscn" id="3_ahwsu"]
 [ext_resource type="PackedScene" uid="uid://b46j3mg31oo7v" path="res://Scènes/hud.tscn" id="4_x6jp7"]
+[ext_resource type="PackedScene" uid="uid://8bg2ffsi8yu5" path="res://Scènes/trigger_box_spawn.tscn" id="5_ncfxm"]
 
 [node name="Main" type="Node2D" unique_id=1805071930]
 
@@ -37,3 +38,6 @@ position = Vector2(2743, 803)
 position = Vector2(762, 791)
 
 [node name="HUD" parent="." unique_id=1241412000 instance=ExtResource("4_x6jp7")]
+
+[node name="TriggerBoxSpawn" parent="." unique_id=429258469 instance=ExtResource("5_ncfxm")]
+position = Vector2(16335, 680)
