@@ -18,8 +18,8 @@ extends CharacterBody2D
 @export var double_saut: bool = false        # passe à True si on peut éxecuter un Double Saut
 
 # --- Gravité asymétrique ---
-@export var gravity_up: float = 1200.0      # quand on monte
-@export var gravity_down: float = 1800.0    # quand on tombe (plus fort = saut plus nerveux)
+@export var gravity_up: float = 1300.0      # quand on monte
+@export var gravity_down: float = 2800.0    # quand on tombe (plus fort = saut plus nerveux)
 
 # --- Dash ---
 @export var dash_speed: float = 700.0

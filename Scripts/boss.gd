@@ -17,10 +17,7 @@ func _process(_delta: float) -> void:
 	sprite.play("idle")
 	
 func takeDamageBoss(amount):
-	print("Vie du Boss : ", vieBoss)
 	vieBoss -= amount
-	print("Le Boss vient de prendre : ", amount, " de dégats !")
-	print("Vie du Boss : ", vieBoss)
 	if vieBoss <= 0:
-		print("BOSS MORT !")
+		Damage.SendDied()
 		queue_free()
