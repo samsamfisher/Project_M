@@ -474,3 +474,125 @@ func _ready() -> void:
 - Une `Area2D` ne détecte un corps que si son **masque de collision** inclut la couche du corps. Si `body_entered` ne se déclenche jamais, vérifier ça en premier.
 
 ---
+## Sprint — Attaque à l'épée (le coup ne doit pas casser l'anim)
+**Branche :** `feat/epee-attaque` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Une attaque à l'épée déclenchée à la touche, dont l'animation se joue **en entier** (avant elle ne montrait qu'une frame puis revenait à idle), et dont la zone de frappe ne blesse **que pendant le coup**.
+
+### 🔧 Comment ça marche
+
+**Le bug « une frame puis idle » :** la cascade d'animations (le miroir de l'état, recalculé chaque frame, cf. sprint *Animations*) rejouait `idle` à chaque frame et **écrasait** l'attaque. Une animation d'**action** (l'attaque) n'est pas une animation miroir : il faut la **protéger** avec un verrou, exactement comme `is_dashing` protège le dash.
+
+```gdscript
+var is_attacking: bool = false
+
+func sword_attack() -> void:
+	is_attacking = true
+	# … on allume aussi la hitbox (voir plus bas)
+	sprite.play("attack_sword")
+
+# dans _physics_process, juste après move_and_slide() :
+if is_attacking:
+	return   # tant qu'on attaque, la cascade d'anims ne tourne pas
+# … cascade idle/run/jump/fall …
+```
+
+**Baisser le verrou au bon moment — le signal `animation_finished` :** on ne *teste* pas si l'anim est finie (erreur : la tester sur la frame de l'appui, alors qu'elle vient juste de démarrer). On **branche** le signal une fois, et c'est lui qui rappelle quand l'anim se termine.
+
+```gdscript
+func _ready() -> void:
+	sprite.animation_finished.connect(_on_anim_finished)
+
+func _on_anim_finished() -> void:
+	if sprite.animation == "attack_sword":   # filtre : QUELLE anim a fini
+		is_attacking = false
+		# … on éteint la hitbox
+```
+
+> ⚠️ `animation_finished` (sur `AnimatedSprite2D`) **ne porte aucune info** : il ne dit pas *quelle* anim a fini. On interroge le nœud avec `sprite.animation`. (À l'inverse, `body_entered(body)` te tend le corps en argument — chaque signal choisit ce qu'il transporte.)
+
+**La hitbox active seulement pendant le coup :** `visible` ne change RIEN à la collision. Le vrai levier, c'est la collision elle-même : éteinte par défaut, allumée dans `sword_attack()`, éteinte dans `_on_anim_finished()`.
+
+```gdscript
+# allumer / éteindre — set_deferred pour éviter l'erreur "flushing queries"
+$Sword/CollisionShape2.set_deferred("disabled", false)  # allume
+$Sword/CollisionShape2.set_deferred("disabled", true)   # éteint
+```
+
+### 🏷️ Concepts / mots-clés
+verrou d'état (`is_attacking`) · animation d'action vs animation miroir · `return` anticipé (comme le dash) · signal `animation_finished` · signal vide vs signal avec argument · `sprite.animation` · hitbox timée · `visible` ≠ collision · `set_deferred`
+
+### 🪤 Pièges / à surveiller
+- **`==` vs `=` :** `is_attacking == false` *compare* (et jette le résultat), `is_attacking = false` *assigne*. (Cf. *expression ≠ instruction* du sprint Gravité.)
+- **Anim d'attaque en boucle (Loop ON)** → `animation_finished` ne part **jamais** → le verrou reste levé pour toujours. L'attaque doit être en **Loop OFF**.
+- **Hits multiples :** si la hitbox reste active un instant, elle peut toucher le même ennemi plusieurs fois. Le jour où ça gêne → tenir une liste « déjà touchés ce coup-ci », vidée à la fin de l'attaque.
+
+---
+
+## Sprint — L'épée touche, blesse et tue le boss
+**Branche :** `feat/epee-attaque` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+La lame détecte le boss, lui retire de la vie à chaque coup, et le **tue** quand sa vie atteint 0. La boucle du jeu est complète : foncer → boss faible → mise à mort rapide. **Le cœur du concept MVP est validé.**
+
+### 🔧 Comment ça marche
+
+**1. La détection — `body_entered` ne voit QUE les corps physiques.** Au départ l'épée (Area2D) ne détectait pas le boss. Cause profonde : une `CollisionShape2D` sous un simple `Node2D` ne fait **rien** — il lui faut un parent qui existe dans le monde physique. On a donné un corps au boss : racine en **`CharacterBody2D`**. Dès lors `body_entered` le voit.
+
+> Mémo : `body_entered` = corps physiques (CharacterBody2D, StaticBody2D…). `area_entered` = Area2D. Une Area2D ne voit une autre Area2D **que** par `area_entered`.
+
+**2. Le groupe va sur le nœud que le signal te tend.** `body_entered(body)` te tend le **corps** (la racine `CharacterBody2D`). Donc le groupe « Boss » va sur la **racine**, jamais sur la CollisionShape (qu'aucun signal ne te tend).
+
+```gdscript
+func _on_sword_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Boss"):
+		Damage.SendDamage(100)   # bus de dégâts (autoload Damage)
+```
+
+**3. Les couches de collision — traverser le boss tout en le frappant.** Le perso restait bloqué contre le boss car il avait le **calque du boss dans son Mask**. Règle d'or : **Layer = ce que je suis · Mask = ce que je regarde / percute.** On enlève le calque « Boss » du Mask du perso → il traverse. L'épée, elle, **garde** le calque « Boss » dans son Mask → elle touche toujours.
+
+**4. La mort — taper sur la BONNE variable.** `vie_de_base` est la constante de départ ; `vieBoss` (= `vie_de_base + temps × facteur`) est la vraie vie courante. Les dégâts doivent fondre **`vieBoss`**, pas `vie_de_base`.
+
+```gdscript
+func takeDamageBoss(amount):
+	vieBoss -= amount
+	print(vieBoss)            # pour la voir descendre
+	if vieBoss <= 0:
+		queue_free()          # le boss meurt
+```
+
+**5. Le spawn différé — « Can't change this state while flushing queries ».** `add_child(boss)` dans `_on_body_entered` plantait : ce signal tourne *pendant* le calcul physique, et y brancher des collisions est interdit. Parade : tout différer.
+
+```gdscript
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		spawn_boss.call_deferred()
+
+func spawn_boss() -> void:
+	var boss = spawnBoss.instantiate()
+	add_child(boss)                                  # ok, on est après le calcul
+	boss.global_position = $Marker2D.global_position # placé une fois dans l'arbre
+```
+
+### 🏷️ Concepts / mots-clés
+`body_entered` vs `area_entered` · CollisionShape ⊂ objet de collision · `CharacterBody2D` · groupe sur le nœud que le signal tend · couches/masques (Layer = je suis, Mask = je regarde) · `vieBoss` vs `vie_de_base` · `queue_free()` · `call_deferred` / `set_deferred` · flushing queries · bus de dégâts (`Damage`)
+
+### 🪤 Pièges / à surveiller
+- **`CollisionShape2D` sous un `Node2D`** = inerte. Toujours un parent objet de collision.
+- **Mask ≠ Layer.** Si deux corps se bloquent, l'un regarde le calque de l'autre. Pour s'ignorer : que personne ne regarde le calque de l'autre.
+- **Si l'épée arrête de toucher après un changement de calque** → vérifier que son **Mask contient le calque du boss**.
+- **Modifier collision/monitoring pendant un signal physique** (`body_entered`, `area_entered`) → différer avec `call_deferred` / `set_deferred`.
+- **`_delta` :** le `delta` non utilisé de `_process` se renomme `_delta` pour calmer le warning jaune.
+
+---
+
+## 📍 État actuel du projet (au 23/06/2026)
+
+- **Branche de travail :** `feat/epee-attaque` (attaque à l'épée + dégâts + mort du boss).
+- **Phase 1 : terminée.** Le mouvement est juteux.
+- **Phase 2 : bien avancée.** Map test ✅, caméra ✅, son au ramassage ✅, boss qui apparaît et scale avec le temps ✅, **et maintenant l'épée qui le blesse et le tue ✅**.
+- **🎮 Cœur du MVP atteint :** foncer → boss faible → mise à mort rapide. La question « est-ce grisant ? » est enfin testable manette en main.
+- **Prochains caps possibles :** écran de résultat (gagné/perdu + temps), une ou deux attaques du boss (il riposte), un type d'ennemi simple. Ensuite → les *signatures* (ressources, choix du coffre…).
+
+> _Prochaine entrée à écrire à la fin du prochain mini-sprint._
