@@ -414,3 +414,63 @@ autoload dédié (un job par boîte) · `AudioStreamPlayer` · `.new()` vs `add_
 - **Ne pas brancher le pop sur le signal `ressources_changees`** : ce signal part à *chaque* changement du total — donc aussi quand on **dépensera** à la boutique → le son sonnerait au mauvais moment. L'appel direct colle le son pile à l'événement « ramassage ».
 - **Garder `_on_area_2d_body_entered` propre** : aujourd'hui 2 réactions (`Stats` + `Sound`), ça va. Quand elles se multiplient (particules, score, succès…) → basculer sur un signal « ramassé » que tout le monde écoute.
 - **À nettoyer un jour (warnings ⚠) :** `$AnimatedSprite2D.play("icon")` dans `_process` tourne à chaque frame (le mettre dans `_ready`), et le `delta` de `_process` n'est pas utilisé.
+
+
+## Sprint — Apparition du boss & sa vie selon le temps
+**Branche :** `feat/boss-vie-scaling` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Quand le joueur traverse une zone à la fin du niveau, un boss **apparaît**. Le boss n'est pas posé d'avance dans le niveau : il est fabriqué à partir de son fichier, pile au moment où on entre dans la zone. Et à sa naissance, il calcule sa vie à partir du temps écoulé — plus on a traîné, plus il est costaud. C'est le cœur du jeu qui prend vie.
+
+### 🔧 Comment ça marche
+
+**1. La zone qui fait apparaître le boss (le trigger)**
+
+- Une `Area2D` posée à la fin du niveau. Elle a un signal intégré, `body_entered`, qui se déclenche tout seul quand un corps entre dedans. On ne crée pas ce signal, on l'**écoute** (branché via l'onglet Node → Signals).
+- On filtre : n'importe quel corps déclenche le signal, donc on vérifie que c'est bien le joueur avec `is_in_group("Player")` (le joueur a été ajouté au groupe `Player`).
+- Le boss est désigné par un **fichier de scène**, pas par un nœud : `@export var spawnBoss: PackedScene`. Dans l'inspecteur, on glisse `boss.tscn` dedans. (Un `PackedScene`, c'est une scène en boîte, prête à être copiée.)
+- À l'entrée du joueur, on fabrique une copie et on la pose dans le niveau :
+
+```gdscript
+extends Area2D
+
+@export var spawnBoss: PackedScene
+
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		var boss = spawnBoss.instantiate()                 # une copie neuve depuis le fichier
+		add_child(boss)                                     # on l'ajoute à l'arbre D'ABORD
+		boss.global_position = $Marker2D.global_position    # PUIS on la place
+```
+
+`instantiate()` fabrique une copie du fichier. `add_child()` la met dans la scène. Le `Marker2D` est un point qu'on déplace dans l'éditeur pour choisir où le boss atterrit.
+
+**2. Le boss qui calcule sa vie (`boss.gd`)**
+
+- `_ready()` ne tourne **qu'une seule fois**, au moment exact où le boss est créé. C'est là qu'on lit le temps, une fois :
+
+```gdscript
+extends Node2D
+
+@export var vie_de_base = 800
+@export var facteur = 1
+var vie: float
+
+func _ready() -> void:
+	vie = vie_de_base + (Stats.time * facteur)
+```
+
+- Différence clé avec la jauge de menace : la jauge relit `Stats.time` à **chaque frame** (dans `_process`) parce qu'elle bouge sans arrêt. Le boss, lui, lit **une fois** et fige le chiffre. Deux outils pour deux besoins.
+- `facteur`, c'est la molette d'équilibrage : il décide à quel point le temps fait gonfler la vie du boss.
+
+### 🏷️ Concepts / mots-clés
+`Area2D` · signal `body_entered` · onglet Node → Signals · groupes / `is_in_group` · `PackedScene` · `instantiate()` · `add_child()` · `Marker2D` · `_ready` vs `_process` · `@export` · `Stats.time` (source unique)
+
+### 🪤 Pièges / à surveiller
+- **« Assigner » ne montre que les nœuds de la scène ouverte.** Pour désigner un boss qui n'existe pas encore dans le niveau, utiliser un `PackedScene` (un fichier), pas une référence de nœud (`Node2D`).
+- `@export var spawnBoss = PackedScene.new()` crée une scène **vide** par défaut. Écrire juste le type : `@export var spawnBoss: PackedScene`. Sinon, si on oublie de glisser le fichier, `instantiate()` fabrique du vide en silence.
+- Régler `global_position` **avant** `add_child()` peut donner un placement faux. Ordre sûr : `add_child()` d'abord, position ensuite.
+- « Le boss n'apparaît pas » était faux : il apparaissait, mais **hors écran** (la caméra suit le joueur, le boss naissait à ~860 px). S'il existe (les `print` le prouvent) mais qu'on ne le voit pas → vérifier son sprite et sa position, pas le spawn.
+- Une `Area2D` ne détecte un corps que si son **masque de collision** inclut la couche du corps. Si `body_entered` ne se déclenche jamais, vérifier ça en premier.
+
+---

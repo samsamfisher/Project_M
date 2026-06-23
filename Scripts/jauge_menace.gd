@@ -4,7 +4,7 @@ extends Control
 var ratio = Stats.time / value_max_jauge
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	var color1 = 1
 	var color2 = 1
 	var color3 = 1

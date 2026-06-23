@@ -183,9 +183,12 @@ animations = [{
 "speed": 12.0
 }]
 
-[node name="Boss" type="Node2D" unique_id=1615111032]
+[node name="Boss" type="CharacterBody2D" unique_id=866464456 groups=["Boss"]]
 scale = Vector2(4, 4)
+collision_layer = 2
+collision_mask = 0
 script = ExtResource("1_8s7gi")
+facteur = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2111189000]
 position = Vector2(6, 14)

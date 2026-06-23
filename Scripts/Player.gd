@@ -7,7 +7,7 @@ extends CharacterBody2D
 # --- Déplacement horizontal ---
 @export var max_speed: float = 300.0        # vitesse de pointe (px/s)
 @export var acceleration: float = 2000.0    # montée en vitesse au sol
-@export var friction: float = 2500.0        # freinage à l'arrêt au sol
+@export var friction: float = 5000.0        # freinage à l'arrêt au sol
 @export var air_acceleration: float = 1500.0 # contrôle dans les airs (un peu moins qu'au sol)
 
 # --- Saut ---
@@ -33,8 +33,19 @@ var dash_timer: float = 0.0
 var dash_cooldown_timer: float = 0.0
 var is_dashing: bool = false
 var facing: int = 1   # 1 = droite, -1 = gauche
+var is_attacking: bool = false
+@onready var collisionEpee = $Sword/CollisionShape2D
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
+
+func _ready() -> void:
+	sprite.animation_finished.connect(_on_anim_finished)
+	collisionEpee.disabled = true
+
+func _on_anim_finished() -> void:
+	if sprite.animation == "attack_sword":
+		is_attacking = false
+		collisionEpee.disabled = true
 
 func _physics_process(delta: float) -> void:
 	# --- On fait avancer tous les timers ---
@@ -67,7 +78,6 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-
 	# Déclenchement du dash
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0:
 		start_dash()
@@ -99,19 +109,27 @@ func _physics_process(delta: float) -> void:
 		jump_buffer_timer = 0
 		coyote_timer = 0
 		double_saut = true
+		
 	# --- Double saut ---	
 	elif not is_on_floor() and double_saut == true and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 		double_saut = false
-		
-
 
 
 	# --- Saut variable : relâcher tôt = saut plus court ---
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= jump_cut_multiplier
+		
+		
+	# --- Sword Attack ---
+	if Input.is_action_just_pressed("swordAttack") and not is_attacking:
+		sword_attack()
+
 
 	move_and_slide()
+	
+	if is_attacking:
+		return
 
 	if not is_on_floor() and velocity.y < 0:
 		sprite.play("jump")
@@ -121,10 +139,25 @@ func _physics_process(delta: float) -> void:
 		sprite.play("run")
 	else:
 		sprite.play("idle")
-	
+		
 
 func start_dash() -> void:
 	is_dashing = true
 	dash_timer = dash_duration
 	dash_cooldown_timer = dash_cooldown
 	velocity = Vector2(facing * dash_speed, 0.0)  # dash horizontal pur
+	
+
+func sword_attack() -> void:
+	is_attacking = true
+	collisionEpee.disabled = false
+	sprite.play("attack_sword")
+	print("attack !")
+	
+
+
+func _on_sword_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Boss"):
+		Damage.SendDamage(100)
+		print("je suis dans la zone")
+		

@@ -10,9 +10,6 @@
 
 [node name="Level" parent="." unique_id=313400406 instance=ExtResource("2_24a1y")]
 
-[node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
-position = Vector2(348, 816)
-
 [node name="Ressources" parent="." unique_id=1239007027 instance=ExtResource("3_ahwsu")]
 position = Vector2(2216, 402)
 
@@ -34,10 +31,10 @@ position = Vector2(15625, 546)
 [node name="Ressources6" parent="." unique_id=1233078947 instance=ExtResource("3_ahwsu")]
 position = Vector2(2743, 803)
 
-[node name="Ressources9" parent="." unique_id=602840492 instance=ExtResource("3_ahwsu")]
-position = Vector2(762, 791)
-
 [node name="HUD" parent="." unique_id=1241412000 instance=ExtResource("4_x6jp7")]
 
 [node name="TriggerBoxSpawn" parent="." unique_id=429258469 instance=ExtResource("5_ncfxm")]
-position = Vector2(16335, 680)
+position = Vector2(15938, 675)
+
+[node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
+position = Vector2(348, 816)

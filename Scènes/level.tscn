@@ -242,7 +242,8 @@ texture = ExtResource("1_600nl")
 12:15/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_pybkn"]
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 8
+physics_layer_0/collision_mask = 3
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.5, 0.34375, 0.25, 1)
@@ -480,7 +481,8 @@ texture = ExtResource("1_600nl")
 12:15/0 = 0
 
 [sub_resource type="TileSet" id="TileSet_xmaip"]
-physics_layer_0/collision_layer = 1
+physics_layer_0/collision_layer = 16
+physics_layer_0/collision_mask = 3
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Plateformes"
 terrain_set_0/terrain_0/color = Color(0.6716544, 0.056310117, 0.47592688, 1)

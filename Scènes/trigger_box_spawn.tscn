@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://8bg2ffsi8yu5"]
 
-[ext_resource type="Script" uid="uid://doleobgwmrmlm" path="res://trigger_box_spawn.gd" id="1_jr2s8"]
+[ext_resource type="Script" uid="uid://doleobgwmrmlm" path="res://Scripts/trigger_box_spawn.gd" id="1_jr2s8"]
 [ext_resource type="PackedScene" uid="uid://ch4ca5vlriirc" path="res://Scènes/boss.tscn" id="2_in824"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_x7rn3"]
