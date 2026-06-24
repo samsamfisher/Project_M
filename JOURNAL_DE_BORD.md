@@ -595,4 +595,47 @@ func spawn_boss() -> void:
 - **🎮 Cœur du MVP atteint :** foncer → boss faible → mise à mort rapide. La question « est-ce grisant ? » est enfin testable manette en main.
 - **Prochains caps possibles :** écran de résultat (gagné/perdu + temps), une ou deux attaques du boss (il riposte), un type d'ennemi simple. Ensuite → les *signatures* (ressources, choix du coffre…).
 
+---
+
+# PHASE 2 — La boucle de jeu (suite)
+
+## Sprint — Ennemi : patrouille
+**Branche :** `feat/ecran-victoire` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Création d'un ennemi simple (`enemy_patrol.tscn`) qui patrouille entre deux points. Il se retourne automatiquement quand il arrive à destination. Base posée pour ajouter la détection + CHASE au prochain sprint.
+
+### 🔧 Comment ça marche
+Deux `Marker2D` placés **dans le niveau** (pas enfants de l'ennemi — sinon ils bougent avec lui). Référencés via `@export` et assignés dans l'Inspecteur Godot.
+
+```gdscript
+@export var marker2D1: Marker2D
+@export var marker2D2: Marker2D
+var cible
+
+func _ready() -> void:
+    cible = marker2D1  # on initialise ici car les @export ne sont pas dispo avant _ready()
+
+func _physics_process(delta):
+    if abs(cible.global_position.x - global_position.x) <= 10:
+        if cible == marker2D1:
+            cible = marker2D2
+        else:
+            cible = marker2D1
+    velocity.x = sign(cible.global_position.x - global_position.x) * SPEED
+```
+
+- `sign(a - b)` → retourne `1`, `-1` ou `0` selon si `a` est à droite, à gauche ou égal à `b`. Pratique pour obtenir une direction sans calcul.
+- `abs()` → valeur absolue, pour mesurer une distance sans se soucier du signe.
+- `global_position` plutôt que `position` → car les deux nœuds peuvent avoir des parents différents. `global_position` est toujours dans le même repère monde.
+
+### 🏷️ Concepts / mots-clés
+`sign()` · `abs()` · `global_position` vs `position` · `@export` · `_ready()` · `Marker2D` · machine à états (PATROL / CHASE)
+
+### 🪤 Pièges / à surveiller
+- **`@export` non assigné dans l'Inspecteur** → variable `Nil` → crash au premier accès. Toujours vérifier l'Inspecteur après avoir ajouté un `@export`.
+- **Marker2D enfant de l'ennemi** → ils bougent avec lui. Toujours les mettre dans la scène parente.
+- **Initialiser une variable avec un `@export` à la déclaration** → impossible, les nœuds ne sont pas encore chargés. Utiliser `_ready()`.
+- **Oublier `* SPEED`** sur `velocity.x` → l'ennemi se déplace d'1 pixel/frame.
+
 > _Prochaine entrée à écrire à la fin du prochain mini-sprint._

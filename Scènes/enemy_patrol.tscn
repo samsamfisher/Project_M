@@ -2,16 +2,11 @@
 
 [ext_resource type="Texture2D" uid="uid://bewufn6f3a8gw" path="res://Sprite/Enemies/Patrol/Dagger Bandit/Dagger Bandit-Idle.png" id="1_7gfvu"]
 [ext_resource type="Script" uid="uid://i080ddjdeu6f" path="res://Scripts/enemy_patrol.gd" id="1_bcjca"]
-[ext_resource type="Texture2D" uid="uid://b1awmsneqq346" path="res://Sprite/Enemies/Patrol/Dagger Bandit/Dagger Bandit-Fall.png" id="2_ms3gq"]
 [ext_resource type="Texture2D" uid="uid://b1km22vm2joff" path="res://Sprite/Enemies/Patrol/Dagger Bandit/Dagger Bandit-Jump.png" id="4_0i1ri"]
-[ext_resource type="Texture2D" uid="uid://c0holnwf4lmdj" path="res://Sprite/Enemies/Patrol/Dagger Bandit/Dagger Bandit-Run.png" id="5_fpa6x"]
+[ext_resource type="Texture2D" uid="uid://detir0wm1c1dd" path="res://Sprite/Enemies/Patrol/Dagger Bandit/Dagger Bandit-Run_refait.png" id="5_ms3gq"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_3bi54"]
 height = 20.0
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_cxupv"]
-atlas = ExtResource("2_ms3gq")
-region = Rect2(0, 0, 128, 78)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gxv4x"]
 atlas = ExtResource("1_7gfvu")
@@ -49,44 +44,41 @@ region = Rect2(896, 0, 128, 78)
 atlas = ExtResource("4_0i1ri")
 region = Rect2(0, 0, 128, 78)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_axu1r"]
+atlas = ExtResource("5_ms3gq")
+region = Rect2(0, 0, 16, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ms3gq"]
+atlas = ExtResource("5_ms3gq")
+region = Rect2(16, 0, 16, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0i1ri"]
+atlas = ExtResource("5_ms3gq")
+region = Rect2(32, 0, 16, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fpa6x"]
+atlas = ExtResource("5_ms3gq")
+region = Rect2(48, 0, 16, 20)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cxupv"]
+atlas = ExtResource("5_ms3gq")
+region = Rect2(64, 0, 16, 20)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_bwyjg"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(0, 0, 128, 78)
+atlas = ExtResource("5_ms3gq")
+region = Rect2(80, 0, 16, 20)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_01ytt"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(128, 0, 128, 78)
+atlas = ExtResource("5_ms3gq")
+region = Rect2(96, 0, 16, 20)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_20m53"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(256, 0, 128, 78)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_aux24"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(384, 0, 128, 78)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_l2mgh"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(512, 0, 128, 78)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_1yade"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(640, 0, 128, 78)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_qamtn"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(768, 0, 128, 78)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_acirf"]
-atlas = ExtResource("5_fpa6x")
-region = Rect2(896, 0, 128, 78)
+atlas = ExtResource("5_ms3gq")
+region = Rect2(112, 0, 16, 20)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_k6n66"]
 animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_cxupv")
-}],
+"frames": [],
 "loop": true,
 "name": &"fall",
 "speed": 5.0
@@ -130,6 +122,21 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_axu1r")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ms3gq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0i1ri")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fpa6x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cxupv")
+}, {
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_bwyjg")
 }, {
 "duration": 1.0,
@@ -137,21 +144,6 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_20m53")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_aux24")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_l2mgh")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_1yade")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_qamtn")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_acirf")
 }],
 "loop": true,
 "name": &"run",
@@ -168,6 +160,7 @@ script = ExtResource("1_bcjca")
 shape = SubResource("CapsuleShape2D_3bi54")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1293252749]
-position = Vector2(22, -24)
+position = Vector2(0, 1)
 sprite_frames = SubResource("SpriteFrames_k6n66")
-animation = &"fall"
+animation = &"run"
+frame_progress = 0.6584117

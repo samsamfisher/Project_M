@@ -3,11 +3,11 @@ extends CharacterBody2D
 
 @export var marker2D1: Marker2D
 @export var marker2D2: Marker2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 var cible
-
+var facing: int = 1   # 1 = droite, -1 = gauche
 const SPEED = 300.0
 const JUMP_VELOCITY = -400.0
-@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 enum {PATROL,CHASE}
 
 func _ready() -> void:
@@ -30,6 +30,10 @@ func _physics_process(delta: float) -> void:
 
 	velocity.x = sign(cible.global_position.x - global_position.x) * SPEED
 	
+	facing = sign(cible.global_position.x - global_position.x)
+	if sprite:
+		sprite.scale.x = facing
+		
 	
 	move_and_slide()
 

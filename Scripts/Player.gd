@@ -4,6 +4,9 @@ extends CharacterBody2D
 #  CONTRÔLEUR DE DÉPLACEMENT
 # =========================================================
 
+# --- Santé Player ---
+@export var vie: int = 3
+
 # --- Déplacement horizontal ---
 @export var max_speed: float = 300.0        # vitesse de pointe (px/s)
 @export var acceleration: float = 2000.0    # montée en vitesse au sol
@@ -39,6 +42,7 @@ var is_attacking: bool = false
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 
 func _ready() -> void:
+	Damage.takeDamage.connect(take_Damage)
 	sprite.animation_finished.connect(_on_anim_finished)
 	collisionEpee.disabled = true
 
@@ -64,7 +68,7 @@ func _physics_process(delta: float) -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	if direction != 0:
 		facing = sign(direction)
-		# Oriente le sprite (commente ces 2 lignes si tu n'as pas encore de sprite)
+		# Oriente le sprite
 		if sprite:
 			sprite.flip_h = facing < 0
 		
@@ -159,5 +163,11 @@ func sword_attack() -> void:
 func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
 		Damage.SendDamage(100)
-		print("je suis dans la zone")
 		
+		
+
+func take_Damage(amount):
+	vie -= amount
+	print(vie)
+	if vie <= 0:
+		print("GAME OVER")

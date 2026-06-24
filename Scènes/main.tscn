@@ -36,7 +36,7 @@ position = Vector2(2743, 803)
 [node name="HUD" parent="." unique_id=1241412000 instance=ExtResource("4_x6jp7")]
 
 [node name="TriggerBoxSpawn" parent="." unique_id=429258469 instance=ExtResource("5_ncfxm")]
-position = Vector2(15945, 672)
+position = Vector2(1146, 640)
 
 [node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
 position = Vector2(348, 816)
@@ -49,7 +49,7 @@ marker2D1 = NodePath("../PatrolPoint1")
 marker2D2 = NodePath("../PatrolPoint2")
 
 [node name="PatrolPoint1" type="Marker2D" parent="." unique_id=1162999779]
-position = Vector2(129, 835)
+position = Vector2(2105, 817)
 
 [node name="PatrolPoint2" type="Marker2D" parent="." unique_id=378019182]
-position = Vector2(1832, 843)
+position = Vector2(2766, 820)
