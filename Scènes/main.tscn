@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://b46j3mg31oo7v" path="res://Scènes/hud.tscn" id="4_x6jp7"]
 [ext_resource type="PackedScene" uid="uid://8bg2ffsi8yu5" path="res://Scènes/trigger_box_spawn.tscn" id="5_ncfxm"]
 [ext_resource type="PackedScene" uid="uid://01drnicps072" path="res://Scènes/victory_menu.tscn" id="6_woylh"]
+[ext_resource type="PackedScene" uid="uid://sfh74fw27ypb" path="res://Scènes/enemy_patrol.tscn" id="7_2f0x7"]
 
 [node name="Main" type="Node2D" unique_id=1805071930]
 
@@ -35,9 +36,20 @@ position = Vector2(2743, 803)
 [node name="HUD" parent="." unique_id=1241412000 instance=ExtResource("4_x6jp7")]
 
 [node name="TriggerBoxSpawn" parent="." unique_id=429258469 instance=ExtResource("5_ncfxm")]
-position = Vector2(473, 677)
+position = Vector2(15945, 672)
 
 [node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
 position = Vector2(348, 816)
 
 [node name="VictoryMenu" parent="." unique_id=1339370158 instance=ExtResource("6_woylh")]
+
+[node name="EnemyPatrol" parent="." unique_id=97726162 node_paths=PackedStringArray("marker2D1", "marker2D2") instance=ExtResource("7_2f0x7")]
+position = Vector2(253, 832)
+marker2D1 = NodePath("../PatrolPoint1")
+marker2D2 = NodePath("../PatrolPoint2")
+
+[node name="PatrolPoint1" type="Marker2D" parent="." unique_id=1162999779]
+position = Vector2(129, 835)
+
+[node name="PatrolPoint2" type="Marker2D" parent="." unique_id=378019182]
+position = Vector2(1832, 843)

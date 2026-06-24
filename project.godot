@@ -81,6 +81,7 @@ swordAttack={
 2d_physics/layer_3="sword"
 2d_physics/layer_4="sol"
 2d_physics/layer_5="plateformes"
+2d_physics/layer_6="Enemies"
 
 [physics]
 
