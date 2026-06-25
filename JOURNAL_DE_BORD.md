@@ -638,4 +638,66 @@ func _physics_process(delta):
 - **Initialiser une variable avec un `@export` à la déclaration** → impossible, les nœuds ne sont pas encore chargés. Utiliser `_ready()`.
 - **Oublier `* SPEED`** sur `velocity.x` → l'ennemi se déplace d'1 pixel/frame.
 
+---
+
+## Sprint — Riposte du boss
+**Branche :** `feat/boss-riposte` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Le boss attaque maintenant le joueur. Deux mains indépendantes (gauche et droite) frappent en alternance via deux `Timer`. Le joueur a une vraie vie (`vie: int = 3`) et une méthode `takeDamage(amount)`. Quand il tombe à 0, le signal `SendPlayerDied()` est émis.
+
+### 🔧 Comment ça marche
+
+**1. Structure du boss — corps + deux mains séparés.**
+Trois `AnimatedSprite2D` indépendants (`Body`, `HandLeft`, `HandRight`), chacun avec sa propre hitbox (`Area2D` + `CollisionShape2D`). Ça permet d'animer et d'activer les collisions séparément pour chaque partie.
+
+**2. Les hitboxes désactivées par défaut.**
+Même pattern que l'épée du joueur : les `CollisionShape2D` des mains sont `disabled = true` dans `_ready()`. Elles ne s'activent que pendant l'animation d'attaque, et se désactivent à la fin.
+
+```gdscript
+func attackBossHandLeft():
+    isAttacking = true
+    collideHandLeftAttack.disabled = false
+    spriteHandLeft.play("hand_attack")
+
+func _on_hand_left_animation_finished() -> void:
+    if spriteHandLeft.animation == "hand_attack":
+        isAttacking = false
+        collideHandLeftAttack.disabled = true
+```
+
+**3. Les Timers déclenchent les attaques.**
+Deux `Timer` en autostart dans la scène, chacun connecté à sa méthode. Quand le timeout arrive → `attackBossHandLeft()` ou `attackBossHandRight()`. Simple et découplé du code.
+
+**4. Communication boss → joueur : appel direct, pas de signal global.**
+Au lieu de passer par le bus `Damage` (qui envoyait le signal à tout le monde, boss inclus), on appelle directement la méthode du joueur :
+
+```gdscript
+func _on_hand_collide_left_body_entered(body: Node2D) -> void:
+    if body.is_in_group("Player"):
+        body.takeDamage(1)
+```
+
+Règle à retenir : **les signaux globaux (autoload) servent à diffuser un événement à plusieurs écouteurs inconnus. Pour parler directement à un nœud qu'on vient de toucher, l'appel direct est plus propre.**
+
+**5. Vie du joueur.**
+Variable simple dans `Player.gd` :
+
+```gdscript
+@export var vie: int = 3
+
+func takeDamage(amount):
+    vie -= amount
+    if vie <= 0:
+        Damage.SendPlayerDied()
+```
+
+### 🏷️ Concepts / mots-clés
+`Area2D` · `CollisionShape2D` disabled · `Timer` autostart · appel direct vs signal global · `is_in_group()` · `animation_finished` · `isAttacking` flag · vie joueur · `SendPlayerDied()`
+
+### 🪤 Pièges / à surveiller
+- **Signal global bidirectionnel** → si boss et joueur écoutent le même signal `SendDamage`, le boss se blesse lui-même quand ses mains touchent le joueur. Solution : appel direct sur le `body` récupéré dans `body_entered`.
+- **Hitbox toujours active** → si on oublie de la désactiver après l'attaque, la main tue le joueur en continu au contact.
+- **`isAttacking` partagé entre les deux mains** → les deux timers peuvent se déclencher simultanément, les deux mains attaquent en même temps. À garder en tête si on veut les rendre exclusives plus tard.
+
 > _Prochaine entrée à écrire à la fin du prochain mini-sprint._
