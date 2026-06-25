@@ -1,0 +1,38 @@
+[gd_scene format=3 uid="uid://01drnicps072"]
+
+[ext_resource type="Script" uid="uid://qtra4w6jdojl" path="res://Scripts/victory_menu.gd" id="1_rcb2u"]
+
+[node name="VictoryMenu" type="CanvasLayer" unique_id=1360133434]
+visible = false
+script = ExtResource("1_rcb2u")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1293067256]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.19641912, 0.19641912, 0.19641912, 0.572)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=954810722]
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -33.5
+offset_right = 33.5
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="Victory" type="Label" parent="VBoxContainer" unique_id=306724103]
+layout_mode = 2
+theme_override_font_sizes/font_size = 80
+text = "VICTORY"
+horizontal_alignment = 1
+
+[node name="Time" type="Label" parent="VBoxContainer" unique_id=1387976768]
+layout_mode = 2
+theme_override_font_sizes/font_size = 60
+text = "0"
+horizontal_alignment = 1

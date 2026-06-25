@@ -414,3 +414,290 @@ autoload dédié (un job par boîte) · `AudioStreamPlayer` · `.new()` vs `add_
 - **Ne pas brancher le pop sur le signal `ressources_changees`** : ce signal part à *chaque* changement du total — donc aussi quand on **dépensera** à la boutique → le son sonnerait au mauvais moment. L'appel direct colle le son pile à l'événement « ramassage ».
 - **Garder `_on_area_2d_body_entered` propre** : aujourd'hui 2 réactions (`Stats` + `Sound`), ça va. Quand elles se multiplient (particules, score, succès…) → basculer sur un signal « ramassé » que tout le monde écoute.
 - **À nettoyer un jour (warnings ⚠) :** `$AnimatedSprite2D.play("icon")` dans `_process` tourne à chaque frame (le mettre dans `_ready`), et le `delta` de `_process` n'est pas utilisé.
+
+
+## Sprint — Apparition du boss & sa vie selon le temps
+**Branche :** `feat/boss-vie-scaling` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Quand le joueur traverse une zone à la fin du niveau, un boss **apparaît**. Le boss n'est pas posé d'avance dans le niveau : il est fabriqué à partir de son fichier, pile au moment où on entre dans la zone. Et à sa naissance, il calcule sa vie à partir du temps écoulé — plus on a traîné, plus il est costaud. C'est le cœur du jeu qui prend vie.
+
+### 🔧 Comment ça marche
+
+**1. La zone qui fait apparaître le boss (le trigger)**
+
+- Une `Area2D` posée à la fin du niveau. Elle a un signal intégré, `body_entered`, qui se déclenche tout seul quand un corps entre dedans. On ne crée pas ce signal, on l'**écoute** (branché via l'onglet Node → Signals).
+- On filtre : n'importe quel corps déclenche le signal, donc on vérifie que c'est bien le joueur avec `is_in_group("Player")` (le joueur a été ajouté au groupe `Player`).
+- Le boss est désigné par un **fichier de scène**, pas par un nœud : `@export var spawnBoss: PackedScene`. Dans l'inspecteur, on glisse `boss.tscn` dedans. (Un `PackedScene`, c'est une scène en boîte, prête à être copiée.)
+- À l'entrée du joueur, on fabrique une copie et on la pose dans le niveau :
+
+```gdscript
+extends Area2D
+
+@export var spawnBoss: PackedScene
+
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		var boss = spawnBoss.instantiate()                 # une copie neuve depuis le fichier
+		add_child(boss)                                     # on l'ajoute à l'arbre D'ABORD
+		boss.global_position = $Marker2D.global_position    # PUIS on la place
+```
+
+`instantiate()` fabrique une copie du fichier. `add_child()` la met dans la scène. Le `Marker2D` est un point qu'on déplace dans l'éditeur pour choisir où le boss atterrit.
+
+**2. Le boss qui calcule sa vie (`boss.gd`)**
+
+- `_ready()` ne tourne **qu'une seule fois**, au moment exact où le boss est créé. C'est là qu'on lit le temps, une fois :
+
+```gdscript
+extends Node2D
+
+@export var vie_de_base = 800
+@export var facteur = 1
+var vie: float
+
+func _ready() -> void:
+	vie = vie_de_base + (Stats.time * facteur)
+```
+
+- Différence clé avec la jauge de menace : la jauge relit `Stats.time` à **chaque frame** (dans `_process`) parce qu'elle bouge sans arrêt. Le boss, lui, lit **une fois** et fige le chiffre. Deux outils pour deux besoins.
+- `facteur`, c'est la molette d'équilibrage : il décide à quel point le temps fait gonfler la vie du boss.
+
+### 🏷️ Concepts / mots-clés
+`Area2D` · signal `body_entered` · onglet Node → Signals · groupes / `is_in_group` · `PackedScene` · `instantiate()` · `add_child()` · `Marker2D` · `_ready` vs `_process` · `@export` · `Stats.time` (source unique)
+
+### 🪤 Pièges / à surveiller
+- **« Assigner » ne montre que les nœuds de la scène ouverte.** Pour désigner un boss qui n'existe pas encore dans le niveau, utiliser un `PackedScene` (un fichier), pas une référence de nœud (`Node2D`).
+- `@export var spawnBoss = PackedScene.new()` crée une scène **vide** par défaut. Écrire juste le type : `@export var spawnBoss: PackedScene`. Sinon, si on oublie de glisser le fichier, `instantiate()` fabrique du vide en silence.
+- Régler `global_position` **avant** `add_child()` peut donner un placement faux. Ordre sûr : `add_child()` d'abord, position ensuite.
+- « Le boss n'apparaît pas » était faux : il apparaissait, mais **hors écran** (la caméra suit le joueur, le boss naissait à ~860 px). S'il existe (les `print` le prouvent) mais qu'on ne le voit pas → vérifier son sprite et sa position, pas le spawn.
+- Une `Area2D` ne détecte un corps que si son **masque de collision** inclut la couche du corps. Si `body_entered` ne se déclenche jamais, vérifier ça en premier.
+
+---
+## Sprint — Attaque à l'épée (le coup ne doit pas casser l'anim)
+**Branche :** `feat/epee-attaque` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Une attaque à l'épée déclenchée à la touche, dont l'animation se joue **en entier** (avant elle ne montrait qu'une frame puis revenait à idle), et dont la zone de frappe ne blesse **que pendant le coup**.
+
+### 🔧 Comment ça marche
+
+**Le bug « une frame puis idle » :** la cascade d'animations (le miroir de l'état, recalculé chaque frame, cf. sprint *Animations*) rejouait `idle` à chaque frame et **écrasait** l'attaque. Une animation d'**action** (l'attaque) n'est pas une animation miroir : il faut la **protéger** avec un verrou, exactement comme `is_dashing` protège le dash.
+
+```gdscript
+var is_attacking: bool = false
+
+func sword_attack() -> void:
+	is_attacking = true
+	# … on allume aussi la hitbox (voir plus bas)
+	sprite.play("attack_sword")
+
+# dans _physics_process, juste après move_and_slide() :
+if is_attacking:
+	return   # tant qu'on attaque, la cascade d'anims ne tourne pas
+# … cascade idle/run/jump/fall …
+```
+
+**Baisser le verrou au bon moment — le signal `animation_finished` :** on ne *teste* pas si l'anim est finie (erreur : la tester sur la frame de l'appui, alors qu'elle vient juste de démarrer). On **branche** le signal une fois, et c'est lui qui rappelle quand l'anim se termine.
+
+```gdscript
+func _ready() -> void:
+	sprite.animation_finished.connect(_on_anim_finished)
+
+func _on_anim_finished() -> void:
+	if sprite.animation == "attack_sword":   # filtre : QUELLE anim a fini
+		is_attacking = false
+		# … on éteint la hitbox
+```
+
+> ⚠️ `animation_finished` (sur `AnimatedSprite2D`) **ne porte aucune info** : il ne dit pas *quelle* anim a fini. On interroge le nœud avec `sprite.animation`. (À l'inverse, `body_entered(body)` te tend le corps en argument — chaque signal choisit ce qu'il transporte.)
+
+**La hitbox active seulement pendant le coup :** `visible` ne change RIEN à la collision. Le vrai levier, c'est la collision elle-même : éteinte par défaut, allumée dans `sword_attack()`, éteinte dans `_on_anim_finished()`.
+
+```gdscript
+# allumer / éteindre — set_deferred pour éviter l'erreur "flushing queries"
+$Sword/CollisionShape2.set_deferred("disabled", false)  # allume
+$Sword/CollisionShape2.set_deferred("disabled", true)   # éteint
+```
+
+### 🏷️ Concepts / mots-clés
+verrou d'état (`is_attacking`) · animation d'action vs animation miroir · `return` anticipé (comme le dash) · signal `animation_finished` · signal vide vs signal avec argument · `sprite.animation` · hitbox timée · `visible` ≠ collision · `set_deferred`
+
+### 🪤 Pièges / à surveiller
+- **`==` vs `=` :** `is_attacking == false` *compare* (et jette le résultat), `is_attacking = false` *assigne*. (Cf. *expression ≠ instruction* du sprint Gravité.)
+- **Anim d'attaque en boucle (Loop ON)** → `animation_finished` ne part **jamais** → le verrou reste levé pour toujours. L'attaque doit être en **Loop OFF**.
+- **Hits multiples :** si la hitbox reste active un instant, elle peut toucher le même ennemi plusieurs fois. Le jour où ça gêne → tenir une liste « déjà touchés ce coup-ci », vidée à la fin de l'attaque.
+
+---
+
+## Sprint — L'épée touche, blesse et tue le boss
+**Branche :** `feat/epee-attaque` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+La lame détecte le boss, lui retire de la vie à chaque coup, et le **tue** quand sa vie atteint 0. La boucle du jeu est complète : foncer → boss faible → mise à mort rapide. **Le cœur du concept MVP est validé.**
+
+### 🔧 Comment ça marche
+
+**1. La détection — `body_entered` ne voit QUE les corps physiques.** Au départ l'épée (Area2D) ne détectait pas le boss. Cause profonde : une `CollisionShape2D` sous un simple `Node2D` ne fait **rien** — il lui faut un parent qui existe dans le monde physique. On a donné un corps au boss : racine en **`CharacterBody2D`**. Dès lors `body_entered` le voit.
+
+> Mémo : `body_entered` = corps physiques (CharacterBody2D, StaticBody2D…). `area_entered` = Area2D. Une Area2D ne voit une autre Area2D **que** par `area_entered`.
+
+**2. Le groupe va sur le nœud que le signal te tend.** `body_entered(body)` te tend le **corps** (la racine `CharacterBody2D`). Donc le groupe « Boss » va sur la **racine**, jamais sur la CollisionShape (qu'aucun signal ne te tend).
+
+```gdscript
+func _on_sword_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Boss"):
+		Damage.SendDamage(100)   # bus de dégâts (autoload Damage)
+```
+
+**3. Les couches de collision — traverser le boss tout en le frappant.** Le perso restait bloqué contre le boss car il avait le **calque du boss dans son Mask**. Règle d'or : **Layer = ce que je suis · Mask = ce que je regarde / percute.** On enlève le calque « Boss » du Mask du perso → il traverse. L'épée, elle, **garde** le calque « Boss » dans son Mask → elle touche toujours.
+
+**4. La mort — taper sur la BONNE variable.** `vie_de_base` est la constante de départ ; `vieBoss` (= `vie_de_base + temps × facteur`) est la vraie vie courante. Les dégâts doivent fondre **`vieBoss`**, pas `vie_de_base`.
+
+```gdscript
+func takeDamageBoss(amount):
+	vieBoss -= amount
+	print(vieBoss)            # pour la voir descendre
+	if vieBoss <= 0:
+		queue_free()          # le boss meurt
+```
+
+**5. Le spawn différé — « Can't change this state while flushing queries ».** `add_child(boss)` dans `_on_body_entered` plantait : ce signal tourne *pendant* le calcul physique, et y brancher des collisions est interdit. Parade : tout différer.
+
+```gdscript
+func _on_body_entered(body: Node2D) -> void:
+	if body.is_in_group("Player"):
+		spawn_boss.call_deferred()
+
+func spawn_boss() -> void:
+	var boss = spawnBoss.instantiate()
+	add_child(boss)                                  # ok, on est après le calcul
+	boss.global_position = $Marker2D.global_position # placé une fois dans l'arbre
+```
+
+### 🏷️ Concepts / mots-clés
+`body_entered` vs `area_entered` · CollisionShape ⊂ objet de collision · `CharacterBody2D` · groupe sur le nœud que le signal tend · couches/masques (Layer = je suis, Mask = je regarde) · `vieBoss` vs `vie_de_base` · `queue_free()` · `call_deferred` / `set_deferred` · flushing queries · bus de dégâts (`Damage`)
+
+### 🪤 Pièges / à surveiller
+- **`CollisionShape2D` sous un `Node2D`** = inerte. Toujours un parent objet de collision.
+- **Mask ≠ Layer.** Si deux corps se bloquent, l'un regarde le calque de l'autre. Pour s'ignorer : que personne ne regarde le calque de l'autre.
+- **Si l'épée arrête de toucher après un changement de calque** → vérifier que son **Mask contient le calque du boss**.
+- **Modifier collision/monitoring pendant un signal physique** (`body_entered`, `area_entered`) → différer avec `call_deferred` / `set_deferred`.
+- **`_delta` :** le `delta` non utilisé de `_process` se renomme `_delta` pour calmer le warning jaune.
+
+---
+
+## 📍 État actuel du projet (au 23/06/2026)
+
+- **Branche de travail :** `feat/epee-attaque` (attaque à l'épée + dégâts + mort du boss).
+- **Phase 1 : terminée.** Le mouvement est juteux.
+- **Phase 2 : bien avancée.** Map test ✅, caméra ✅, son au ramassage ✅, boss qui apparaît et scale avec le temps ✅, **et maintenant l'épée qui le blesse et le tue ✅**.
+- **🎮 Cœur du MVP atteint :** foncer → boss faible → mise à mort rapide. La question « est-ce grisant ? » est enfin testable manette en main.
+- **Prochains caps possibles :** écran de résultat (gagné/perdu + temps), une ou deux attaques du boss (il riposte), un type d'ennemi simple. Ensuite → les *signatures* (ressources, choix du coffre…).
+
+---
+
+# PHASE 2 — La boucle de jeu (suite)
+
+## Sprint — Ennemi : patrouille
+**Branche :** `feat/ecran-victoire` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Création d'un ennemi simple (`enemy_patrol.tscn`) qui patrouille entre deux points. Il se retourne automatiquement quand il arrive à destination. Base posée pour ajouter la détection + CHASE au prochain sprint.
+
+### 🔧 Comment ça marche
+Deux `Marker2D` placés **dans le niveau** (pas enfants de l'ennemi — sinon ils bougent avec lui). Référencés via `@export` et assignés dans l'Inspecteur Godot.
+
+```gdscript
+@export var marker2D1: Marker2D
+@export var marker2D2: Marker2D
+var cible
+
+func _ready() -> void:
+    cible = marker2D1  # on initialise ici car les @export ne sont pas dispo avant _ready()
+
+func _physics_process(delta):
+    if abs(cible.global_position.x - global_position.x) <= 10:
+        if cible == marker2D1:
+            cible = marker2D2
+        else:
+            cible = marker2D1
+    velocity.x = sign(cible.global_position.x - global_position.x) * SPEED
+```
+
+- `sign(a - b)` → retourne `1`, `-1` ou `0` selon si `a` est à droite, à gauche ou égal à `b`. Pratique pour obtenir une direction sans calcul.
+- `abs()` → valeur absolue, pour mesurer une distance sans se soucier du signe.
+- `global_position` plutôt que `position` → car les deux nœuds peuvent avoir des parents différents. `global_position` est toujours dans le même repère monde.
+
+### 🏷️ Concepts / mots-clés
+`sign()` · `abs()` · `global_position` vs `position` · `@export` · `_ready()` · `Marker2D` · machine à états (PATROL / CHASE)
+
+### 🪤 Pièges / à surveiller
+- **`@export` non assigné dans l'Inspecteur** → variable `Nil` → crash au premier accès. Toujours vérifier l'Inspecteur après avoir ajouté un `@export`.
+- **Marker2D enfant de l'ennemi** → ils bougent avec lui. Toujours les mettre dans la scène parente.
+- **Initialiser une variable avec un `@export` à la déclaration** → impossible, les nœuds ne sont pas encore chargés. Utiliser `_ready()`.
+- **Oublier `* SPEED`** sur `velocity.x` → l'ennemi se déplace d'1 pixel/frame.
+
+---
+
+## Sprint — Riposte du boss
+**Branche :** `feat/boss-riposte` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Le boss attaque maintenant le joueur. Deux mains indépendantes (gauche et droite) frappent en alternance via deux `Timer`. Le joueur a une vraie vie (`vie: int = 3`) et une méthode `takeDamage(amount)`. Quand il tombe à 0, le signal `SendPlayerDied()` est émis.
+
+### 🔧 Comment ça marche
+
+**1. Structure du boss — corps + deux mains séparés.**
+Trois `AnimatedSprite2D` indépendants (`Body`, `HandLeft`, `HandRight`), chacun avec sa propre hitbox (`Area2D` + `CollisionShape2D`). Ça permet d'animer et d'activer les collisions séparément pour chaque partie.
+
+**2. Les hitboxes désactivées par défaut.**
+Même pattern que l'épée du joueur : les `CollisionShape2D` des mains sont `disabled = true` dans `_ready()`. Elles ne s'activent que pendant l'animation d'attaque, et se désactivent à la fin.
+
+```gdscript
+func attackBossHandLeft():
+    isAttacking = true
+    collideHandLeftAttack.disabled = false
+    spriteHandLeft.play("hand_attack")
+
+func _on_hand_left_animation_finished() -> void:
+    if spriteHandLeft.animation == "hand_attack":
+        isAttacking = false
+        collideHandLeftAttack.disabled = true
+```
+
+**3. Les Timers déclenchent les attaques.**
+Deux `Timer` en autostart dans la scène, chacun connecté à sa méthode. Quand le timeout arrive → `attackBossHandLeft()` ou `attackBossHandRight()`. Simple et découplé du code.
+
+**4. Communication boss → joueur : appel direct, pas de signal global.**
+Au lieu de passer par le bus `Damage` (qui envoyait le signal à tout le monde, boss inclus), on appelle directement la méthode du joueur :
+
+```gdscript
+func _on_hand_collide_left_body_entered(body: Node2D) -> void:
+    if body.is_in_group("Player"):
+        body.takeDamage(1)
+```
+
+Règle à retenir : **les signaux globaux (autoload) servent à diffuser un événement à plusieurs écouteurs inconnus. Pour parler directement à un nœud qu'on vient de toucher, l'appel direct est plus propre.**
+
+**5. Vie du joueur.**
+Variable simple dans `Player.gd` :
+
+```gdscript
+@export var vie: int = 3
+
+func takeDamage(amount):
+    vie -= amount
+    if vie <= 0:
+        Damage.SendPlayerDied()
+```
+
+### 🏷️ Concepts / mots-clés
+`Area2D` · `CollisionShape2D` disabled · `Timer` autostart · appel direct vs signal global · `is_in_group()` · `animation_finished` · `isAttacking` flag · vie joueur · `SendPlayerDied()`
+
+### 🪤 Pièges / à surveiller
+- **Signal global bidirectionnel** → si boss et joueur écoutent le même signal `SendDamage`, le boss se blesse lui-même quand ses mains touchent le joueur. Solution : appel direct sur le `body` récupéré dans `body_entered`.
+- **Hitbox toujours active** → si on oublie de la désactiver après l'attaque, la main tue le joueur en continu au contact.
+- **`isAttacking` partagé entre les deux mains** → les deux timers peuvent se déclencher simultanément, les deux mains attaquent en même temps. À garder en tête si on veut les rendre exclusives plus tard.
+
+> _Prochaine entrée à écrire à la fin du prochain mini-sprint._
