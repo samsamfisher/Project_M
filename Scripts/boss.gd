@@ -11,7 +11,6 @@ extends Node2D
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	vieBoss = vie_de_base + (Stats.time * facteur)
-	Damage.takeDamage.connect(takeDamageBoss)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -40,4 +39,4 @@ func _on_body_animation_finished() -> void:
 
 func _on_hand_collide_left_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
-		Damage.SendDamage(1)
+		body.takeDamage(1)

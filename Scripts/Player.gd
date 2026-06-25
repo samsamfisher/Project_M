@@ -42,7 +42,6 @@ var is_attacking: bool = false
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 
 func _ready() -> void:
-	Damage.takeDamage.connect(take_Damage)
 	sprite.animation_finished.connect(_on_anim_finished)
 	collisionEpee.disabled = true
 
@@ -162,12 +161,13 @@ func sword_attack() -> void:
 
 func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
-		Damage.SendDamage(100)
+		body.takeDamageBoss(100)
+		print("LE BOSS PERDS 100 DE VIE")
 		
 		
 
-func take_Damage(amount):
+func takeDamage(amount):
 	vie -= amount
-	print(vie)
+	print("Vie restantes : ", vie)
 	if vie <= 0:
-		print("GAME OVER")
+		Damage.SendPlayerDied()

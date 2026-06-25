@@ -5,7 +5,6 @@ extends CanvasLayer
 func _ready() -> void:
 	Damage.died.connect(displayMenu)
 	
-
 func displayMenu():
 	visible = true
 	$VBoxContainer/Time.text = "%.2f" % Stats.time
