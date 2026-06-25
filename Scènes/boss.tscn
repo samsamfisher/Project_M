@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://brtrwrpjbjyu0" path="res://Scripts/boss.gd" id="1_8s7gi"]
 [ext_resource type="Texture2D" uid="uid://vhb5eb30polp" path="res://Sprite/Enemies/Bone_Reaper_Boss/Head/Head (Final)-Death.png" id="2_cxkc6"]
 [ext_resource type="Texture2D" uid="uid://blhlodv8wy2bh" path="res://Sprite/Enemies/Bone_Reaper_Boss/Hand (Flip to get both hands)/Hand (Final)-Idle.png" id="3_dk4jh"]
+[ext_resource type="Texture2D" uid="uid://dlvq1bmnqfuxb" path="res://Sprite/Enemies/Bone_Reaper_Boss/Hand (Flip to get both hands)/Hand (Final)-Slam.png" id="4_hgrr7"]
 [ext_resource type="Texture2D" uid="uid://bqpwt5yqjjvjr" path="res://Sprite/Enemies/Bone_Reaper_Boss/Hand (Flip to get both hands)/Hand (Final)-Death.png" id="4_o277j"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_6xxrv"]
@@ -478,6 +479,102 @@ animations = [{
 "speed": 12.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_4o747"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(0, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ldu5d"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(133, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6d3ab"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(266, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3g74d"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(399, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g6qr4"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(532, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_snn5b"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(665, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_05kfj"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(798, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ii8y6"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(931, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1keh6"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1064, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wru4d"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1197, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h5oep"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1330, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eecxy"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1463, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q88i2"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1596, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yl500"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1729, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y2ndq"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1862, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rra2i"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(1995, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ak6q0"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2128, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rdje2"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2261, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4rvpe"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2394, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ouu3"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2527, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sdu5u"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2660, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hwqlb"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2793, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_odspl"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(2926, 0, 133, 103)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nl5ge"]
+atlas = ExtResource("4_hgrr7")
+region = Rect2(3059, 0, 133, 103)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_3lrpv"]
 atlas = ExtResource("4_o277j")
 region = Rect2(0, 0, 133, 103)
@@ -742,6 +839,83 @@ region = Rect2(3059, 0, 133, 103)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_4o747")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ldu5d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6d3ab")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3g74d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g6qr4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_snn5b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_05kfj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ii8y6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1keh6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wru4d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h5oep")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eecxy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q88i2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yl500")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y2ndq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rra2i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ak6q0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rdje2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4rvpe")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6ouu3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sdu5u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hwqlb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_odspl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_nl5ge")
+}],
+"loop": false,
+"name": &"hand_attack",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_3lrpv")
 }, {
 "duration": 1.0,
@@ -968,9 +1142,13 @@ animation = &"death"
 [node name="HandLeft" type="AnimatedSprite2D" parent="." unique_id=1334525085]
 position = Vector2(-25, 29)
 sprite_frames = SubResource("SpriteFrames_c8pta")
-animation = &"hand_death"
+animation = &"hand_attack"
+frame = 8
+frame_progress = 0.77701765
 
 [node name="HandCollideLeft" type="Area2D" parent="HandLeft" unique_id=102327279]
+position = Vector2(14, 38)
+scale = Vector2(1.5827187, 0.75242275)
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HandLeft/HandCollideLeft" unique_id=424369482]
@@ -980,16 +1158,32 @@ shape = SubResource("CircleShape2D_o277j")
 [node name="HandRight" type="AnimatedSprite2D" parent="." unique_id=757531908]
 position = Vector2(35, 29)
 sprite_frames = SubResource("SpriteFrames_c8pta")
-animation = &"hand_death"
+animation = &"hand_attack"
+frame = 23
+frame_progress = 1.0
 flip_h = true
 
 [node name="HandCollideRight" type="Area2D" parent="HandRight" unique_id=1013458182]
-position = Vector2(51.5, 1.25)
+position = Vector2(66.25, 38.5)
+scale = Vector2(1.5745414, 0.7392857)
 collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HandRight/HandCollideRight" unique_id=1962791196]
 position = Vector2(-25.5, 9.75)
 shape = SubResource("CircleShape2D_o277j")
 
+[node name="TimerAttackHandLeft" type="Timer" parent="." unique_id=57635923]
+wait_time = 6.0
+autostart = true
+
+[node name="TimerAttackHandRight" type="Timer" parent="." unique_id=400537382]
+wait_time = 3.0
+autostart = true
+
 [connection signal="animation_finished" from="Body" to="." method="_on_body_animation_finished"]
+[connection signal="animation_finished" from="HandLeft" to="." method="_on_hand_left_animation_finished"]
 [connection signal="body_entered" from="HandLeft/HandCollideLeft" to="." method="_on_hand_collide_left_body_entered"]
+[connection signal="animation_finished" from="HandRight" to="." method="_on_hand_right_animation_finished"]
+[connection signal="body_entered" from="HandRight/HandCollideRight" to="." method="_on_hand_collide_right_body_entered"]
+[connection signal="timeout" from="TimerAttackHandLeft" to="." method="_on_timer_attack_hand_left_timeout"]
+[connection signal="timeout" from="TimerAttackHandRight" to="." method="_on_timer_attack_hand_right_timeout"]
