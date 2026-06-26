@@ -5,7 +5,8 @@ extends Area2D
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
 		spawn_boss.call_deferred()
-
+		$Area2D.queue_free()
+		
 func spawn_boss() -> void:
 	var boss = spawnBoss.instantiate()
 	add_child(boss)

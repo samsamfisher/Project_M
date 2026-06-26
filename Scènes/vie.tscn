@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://bcspb4ehga1tj"]
+
+[ext_resource type="Script" uid="uid://d1t35fwgv1kgy" path="res://Scripts/vie.gd" id="1_cjy6v"]
+
+[node name="Vie" type="Control" unique_id=1309625666]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Vie" type="Label" parent="." unique_id=1824353086]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 26.0
+offset_top = -50.0
+offset_right = 66.0
+offset_bottom = -27.0
+grow_vertical = 0
+text = "3"
+script = ExtResource("1_cjy6v")

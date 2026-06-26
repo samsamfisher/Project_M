@@ -1,0 +1,48 @@
+[gd_scene format=3 uid="uid://dit5hew1bevgw"]
+
+[ext_resource type="Texture2D" uid="uid://djhntmn87k45o" path="res://Sprite/UI/UI - Words/Words With BG/UI - Words12.png" id="1_3aw15"]
+[ext_resource type="Script" uid="uid://48xpln4e6de3" path="res://Scripts/button_menu_end.gd" id="1_hl8ef"]
+[ext_resource type="Texture2D" uid="uid://5fk6dk65qovt" path="res://Sprite/UI/UI - Words/Words With BG/UI - Words10.png" id="2_hl8ef"]
+[ext_resource type="Texture2D" uid="uid://bv82e0y1pshh5" path="res://Sprite/UI/UI - Words/Words With BG/UI - Words3.png" id="3_0hrtn"]
+
+[node name="ButtonMenuEnd" type="Control" unique_id=1718327684]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_hl8ef")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1119857170]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = -600.0
+offset_bottom = 131.0
+grow_horizontal = 2
+scale = Vector2(2, 2)
+alignment = 1
+
+[node name="Restart" type="Button" parent="VBoxContainer" unique_id=176628730]
+layout_mode = 2
+icon = ExtResource("1_3aw15")
+flat = true
+icon_alignment = 1
+
+[node name="MainMenu" type="Button" parent="VBoxContainer" unique_id=1327969971]
+layout_mode = 2
+icon = ExtResource("2_hl8ef")
+flat = true
+icon_alignment = 1
+
+[node name="Quit" type="Button" parent="VBoxContainer" unique_id=1576700393]
+layout_mode = 2
+action_mode = 0
+icon = ExtResource("3_0hrtn")
+flat = true
+icon_alignment = 1
+
+[connection signal="pressed" from="VBoxContainer/Restart" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="VBoxContainer/MainMenu" to="." method="_on_main_menu_pressed"]
+[connection signal="pressed" from="VBoxContainer/Quit" to="." method="_on_quit_pressed"]

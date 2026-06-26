@@ -4,6 +4,7 @@ extends CanvasLayer
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	Damage.playerDied.connect(displayGameOver)
+	visible = false
 
 func displayGameOver():
 	visible = true

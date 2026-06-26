@@ -62,13 +62,13 @@ func _on_hand_left_animation_finished() -> void:
 	if spriteHandLeft.animation == "hand_attack":
 		isAttacking = false
 		collideHandLeftAttack.disabled = true
-		spriteHandLeft.animation = "hand_idle"
+		spriteHandLeft.play("hand_idle")
 
 func _on_hand_right_animation_finished() -> void:
 	if spriteHandRight.animation == "hand_attack":
 		isAttacking = false
 		collideHandRightAttack.disabled = true
-		spriteHandRight.animation = "hand_idle"
+		spriteHandRight.play("hand_idle")
 
 # --- Timer finis ---
 func _on_timer_attack_hand_left_timeout() -> void:

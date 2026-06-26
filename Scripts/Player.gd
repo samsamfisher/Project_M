@@ -4,9 +4,6 @@ extends CharacterBody2D
 #  CONTRÔLEUR DE DÉPLACEMENT
 # =========================================================
 
-# --- Santé Player ---
-@export var vie: int = 3
-
 # --- Déplacement horizontal ---
 @export var max_speed: float = 300.0        # vitesse de pointe (px/s)
 @export var acceleration: float = 2000.0    # montée en vitesse au sol
@@ -38,7 +35,6 @@ var is_dashing: bool = false
 var facing: int = 1   # 1 = droite, -1 = gauche
 var is_attacking: bool = false
 @onready var collisionEpee = $Sword/CollisionShape2D
-
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
 
 func _ready() -> void:
@@ -150,24 +146,21 @@ func start_dash() -> void:
 	dash_cooldown_timer = dash_cooldown
 	velocity = Vector2(facing * dash_speed, 0.0)  # dash horizontal pur
 	
-
 func sword_attack() -> void:
 	is_attacking = true
 	collisionEpee.disabled = false
 	sprite.play("attack_sword")
 	print("attack !")
 	
-
-
 func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
 		body.takeDamageBoss(100)
 		print("LE BOSS PERDS 100 DE VIE")
 		
-		
-
 func takeDamage(amount):
-	vie -= amount
-	print("Vie restantes : ", vie)
-	if vie <= 0:
+	Stats.vie -= amount
+	Stats.vie_changee.emit(Stats.vie)
+	print("Vie restantes : ", Stats.vie)
+	print("Vie sur STATS : ", Stats.vie)
+	if Stats.vie <= 0:
 		Damage.SendPlayerDied()

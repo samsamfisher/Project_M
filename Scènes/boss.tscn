@@ -1173,7 +1173,7 @@ position = Vector2(-25.5, 9.75)
 shape = SubResource("CircleShape2D_o277j")
 
 [node name="TimerAttackHandLeft" type="Timer" parent="." unique_id=57635923]
-wait_time = 6.0
+wait_time = 3.0
 autostart = true
 
 [node name="TimerAttackHandRight" type="Timer" parent="." unique_id=400537382]
