@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://01drnicps072" path="res://Scènes/victory_menu.tscn" id="6_woylh"]
 [ext_resource type="PackedScene" uid="uid://sfh74fw27ypb" path="res://Scènes/enemy_patrol.tscn" id="7_2f0x7"]
 [ext_resource type="PackedScene" uid="uid://vr8gfvkx4y27" path="res://Scènes/game_over.tscn" id="7_us3xc"]
+[ext_resource type="PackedScene" uid="uid://epsfpexm76oo" path="res://Scènes/coffre.tscn" id="9_431bi"]
 
 [node name="Main" type="Node2D" unique_id=1805071930]
 
@@ -37,10 +38,7 @@ position = Vector2(2743, 803)
 [node name="HUD" parent="." unique_id=1241412000 instance=ExtResource("4_x6jp7")]
 
 [node name="TriggerBoxSpawn" parent="." unique_id=429258469 instance=ExtResource("5_ncfxm")]
-position = Vector2(-988, 690)
-
-[node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
-position = Vector2(-1186, 810)
+position = Vector2(17156, 676)
 
 [node name="VictoryMenu" parent="." unique_id=1339370158 instance=ExtResource("6_woylh")]
 
@@ -56,3 +54,21 @@ position = Vector2(2105, 817)
 
 [node name="PatrolPoint2" type="Marker2D" parent="." unique_id=378019182]
 position = Vector2(2766, 820)
+
+[node name="Coffre" parent="." unique_id=1779379849 instance=ExtResource("9_431bi")]
+position = Vector2(16294, 762)
+
+[node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
+position = Vector2(-1186, 810)
+
+[node name="Coffre2" parent="." unique_id=1835215651 instance=ExtResource("9_431bi")]
+position = Vector2(-772, 759)
+
+[node name="Ressources2" parent="." unique_id=1262155479 instance=ExtResource("3_ahwsu")]
+position = Vector2(-1064, 825)
+
+[node name="Ressources9" parent="." unique_id=799288006 instance=ExtResource("3_ahwsu")]
+position = Vector2(-1021, 827)
+
+[node name="Ressources10" parent="." unique_id=651710690 instance=ExtResource("3_ahwsu")]
+position = Vector2(-985, 827)
