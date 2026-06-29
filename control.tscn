@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://57j7hyu7qscw"]
+
+[sub_resource type="GDScript" id="GDScript_uchyk"]
+script/source = "extends Control
+
+
+func _ready():
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+
+
+func _on_pressed() -> void:
+	print(\"@@@@@@@@@@@@@@@@@@@@@\")
+"
+
+[node name="Control" type="Button" unique_id=521065806]
+process_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = SubResource("GDScript_uchyk")
+
+[connection signal="pressed" from="." to="." method="_on_pressed"]

@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bv82e0y1pshh5" path="res://Sprite/UI/UI - Words/Words With BG/UI - Words3.png" id="3_0hrtn"]
 
 [node name="ButtonMenuEnd" type="Control" unique_id=1718327684]
+process_mode = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

@@ -9,7 +9,14 @@ signal vie_changee(vie: int)
 
 func _process(delta: float) -> void:
 	time += facteur_speed_jauge * delta
-	
+
 func ajouter_ressource() -> void:
 	ressources += 1
 	ressources_changees.emit(ressources)  # émettre
+
+func restart():
+	ressources = 0
+	vie = 3
+	time = 0
+	get_tree().paused = false
+	get_tree().reload_current_scene()

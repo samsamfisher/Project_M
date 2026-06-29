@@ -321,9 +321,21 @@ visible = true    # affiché à la mort / victoire
 
 ```gdscript
 get_tree().paused = true
+get_tree().paused = false
 ```
 
-Les nœuds continuent de fonctionner seulement si leur `Process Mode` est réglé sur `Always` ou `When Paused` dans l'inspecteur. Par défaut un nœud est mis en pause.
+Les nœuds continuent de fonctionner seulement si leur `Process Mode` est réglé sur `Always` ou `When Paused` dans l'inspecteur. Par défaut un nœud est mis en pause (`Inherit`).
+
+**Choisir le bon mode pour l'UI de pause / game over :**
+- `Always` → tourne tout le temps (avant ET pendant la pause) — risque d'effets de bord en jeu normal
+- `When Paused` → actif **uniquement** quand le jeu est en pause — parfait pour les menus game over / victoire
+
+```gdscript
+# Dans l'inspecteur : nœud racine de l'UI → Process Mode → When Paused
+# Tous les enfants héritent automatiquement via Inherit
+```
+
+**Piège :** si les boutons ne répondent pas en pause, c'est souvent le `Process Mode` du nœud parent qui est resté sur `Inherit` — il hérite de la pause de l'arbre principal et se gèle.
 
 ---
 
@@ -367,9 +379,37 @@ enum {PATROL, CHASE}   # machine à états simple
 
 ---
 
+## 17. Changer de scène / relancer le niveau
+
+```gdscript
+# Recharger la scène courante
+get_tree().reload_current_scene()
+
+# Aller vers une scène spécifique
+get_tree().change_scene_to_file("res://Scènes/main.tscn")
+```
+
+**Attention aux Autoloads :** ils persistent entre les rechargements de scène — leurs variables ne se remettent pas à zéro automatiquement. Il faut une méthode `restart()` dédiée.
+
+```gdscript
+# Dans Stats.gd
+func restart() -> void:
+    ressources = 0
+    vie = 3
+    time = 0
+    get_tree().paused = false
+    get_tree().reload_current_scene()
+```
+
+**Pourquoi ne pas émettre les signaux dans restart() ?** Parce que `reload_current_scene()` recrée tous les nœuds HUD depuis zéro — leurs `_ready()` relisent directement les variables de `Stats`. Les signaux sont inutiles ici.
+
+---
+
 ## Pièges connus
 
 - **`call_deferred()` dans `body_entered`** : instancier une scène directement dans un callback physique peut crasher — toujours différer.
 - **`queue_free()` pas `free()`** : `free()` immédiat peut crasher si d'autres nœuds référencent encore l'objet.
-- **Pause et UI** : si l'UI ne répond plus en pause, vérifier le `Process Mode` du nœud (le mettre en `Always`).
+- **Pause et UI** : si les boutons ne répondent plus en pause, mettre le `Process Mode` du nœud racine de l'UI sur `When Paused` (pas `Always` — risque d'effets de bord).
 - **`flip_h` vs `scale.x`** : `flip_h` ne retourne que le sprite ; `scale.x = -1` retourne le nœud entier et ses enfants (hitboxes comprises).
+- **Autoloads et reload** : les singletons (Stats, Damage…) survivent au rechargement de scène. Toujours remettre leur état à zéro dans une méthode `restart()` avant `reload_current_scene()`.
+- **ColorRect et Mouse Filter** : un `ColorRect` plein écran peut bloquer les clics sur les nœuds derrière lui. Vérifier la propriété `Mouse Filter` (la passer à `Ignore` si le ColorRect est purement décoratif). — *non vérifié en pratique sur ce projet, à tester si le cas se présente.*
