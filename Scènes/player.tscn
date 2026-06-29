@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://1xygtj03otne"]
 
 [ext_resource type="Script" uid="uid://c5qonyk37tagj" path="res://Scripts/Player.gd" id="1_c544a"]
+[ext_resource type="Texture2D" uid="uid://daivb1lf3dsy0" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Inventory Start.png" id="2_3idgr"]
 [ext_resource type="Texture2D" uid="uid://doyjibg70a1sy" path="res://Sprite/Hero/DARK - Hero + Sword/Holding/Platformer Hero - with Weapon-Attack 1.png" id="2_anahk"]
 [ext_resource type="Texture2D" uid="uid://dly3fmyng6604" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Fall.png" id="2_wss7u"]
 [ext_resource type="Texture2D" uid="uid://cukxj34gb8w7r" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Idle.png" id="3_cucgj"]
@@ -11,6 +12,38 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_c544a"]
 radius = 9.0
 height = 25.0
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xpy35"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ms2o"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_huv4t"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2vxm6"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ioi63"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h7enx"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i3p3a"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4kg8g"]
+atlas = ExtResource("2_3idgr")
+region = Rect2(448, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uku4h"]
 atlas = ExtResource("2_anahk")
@@ -160,6 +193,35 @@ region = Rect2(448, 0, 64, 64)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_xpy35")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ms2o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_huv4t")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2vxm6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ioi63")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h7enx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i3p3a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4kg8g")
+}],
+"loop": 0,
+"name": &"RessourceToMarchand",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_uku4h")
 }, {
 "duration": 1.0,
@@ -189,7 +251,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jl6gp")
 }],
-"loop": false,
+"loop": 0,
 "name": &"attack_sword",
 "speed": 14.0
 }, {
@@ -206,7 +268,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_vuwcd")
 }],
-"loop": true,
+"loop": 1,
 "name": &"fall",
 "speed": 5.0
 }, {
@@ -217,7 +279,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_vt3sh")
 }],
-"loop": true,
+"loop": 1,
 "name": &"hit",
 "speed": 9.0
 }, {
@@ -246,7 +308,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ia37u")
 }],
-"loop": true,
+"loop": 1,
 "name": &"idle",
 "speed": 12.0
 }, {
@@ -263,7 +325,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_spsb6")
 }],
-"loop": false,
+"loop": 0,
 "name": &"jump",
 "speed": 5.0
 }, {
@@ -292,7 +354,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gx0eq")
 }],
-"loop": true,
+"loop": 1,
 "name": &"run",
 "speed": 20.0
 }]
@@ -300,6 +362,10 @@ animations = [{
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jpc5c"]
 radius = 12.002169
 height = 41.99956
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2iv3x"]
+radius = 14.0
+height = 33.0
 
 [node name="Player" type="CharacterBody2D" unique_id=557671400 groups=["Player"]]
 scale = Vector2(2, 2)
@@ -318,8 +384,8 @@ shape = SubResource("CapsuleShape2D_c544a")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=443572277]
 position = Vector2(10, 13)
 sprite_frames = SubResource("SpriteFrames_caakp")
-animation = &"attack_sword"
-frame = 9
+animation = &"RessourceToMarchand"
+frame = 7
 frame_progress = 1.0
 offset = Vector2(-8, -12)
 
@@ -336,5 +402,13 @@ position = Vector2(22.5, 3.0000002)
 rotation = -1.5753844
 shape = SubResource("CapsuleShape2D_jpc5c")
 
+[node name="Detection" type="Area2D" parent="." unique_id=1788486836]
+collision_mask = 64
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Detection" unique_id=75935367]
+shape = SubResource("CapsuleShape2D_2iv3x")
+
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
 [connection signal="body_entered" from="Sword" to="." method="_on_sword_body_entered"]
+[connection signal="area_entered" from="Detection" to="." method="_on_detection_area_entered"]
+[connection signal="area_exited" from="Detection" to="." method="_on_detection_area_exited"]

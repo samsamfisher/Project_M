@@ -405,6 +405,88 @@ func restart() -> void:
 
 ---
 
+## 18. Détection Area2D ↔ Area2D (interaction marchand)
+
+Pour détecter une `Area2D` depuis une autre `Area2D`, utiliser `area_entered` et non `body_entered`.
+
+| Signal | Détecte |
+|---|---|
+| `body_entered` | `CharacterBody2D`, `RigidBody2D` — corps avec physique |
+| `area_entered` | `Area2D` — zones de détection sans physique |
+
+**Piège courant :** le groupe doit être sur le bon nœud. Si l'`Area2D` du marchand détecte le joueur, c'est **l'`Area2D`** qui doit être dans le groupe — pas son nœud parent.
+
+```gdscript
+# Dans Player.gd — détecte quand une Area2D entre dans la zone Detection
+func _on_detection_area_entered(area: Area2D) -> void:
+    if area.is_in_group("Marchand"):
+        is_nextToMarchand = true
+
+func _on_detection_area_exited(area: Area2D) -> void:
+    if area.is_in_group("Marchand"):
+        is_nextToMarchand = false
+```
+
+Les **layers/masks** doivent aussi correspondre entre les deux `Area2D` pour que la détection fonctionne.
+
+---
+
+## 19. Input dans un signal vs dans _process
+
+`Input.is_action_just_pressed()` retourne `true` pendant **une seule frame**. Si tu le mets dans un signal (ex: `body_entered`, `area_entered`), la probabilité que le joueur appuie exactement cette frame-là est quasi nulle.
+
+**Règle :** toujours lire les inputs dans `_process` ou `_physics_process`, jamais dans un callback de signal.
+
+```gdscript
+# Mauvais — ne fonctionnera presque jamais
+func _on_detection_area_entered(area: Area2D) -> void:
+    if Input.is_action_just_pressed("interact"):   # ← trop tard
+        faire_quelque_chose()
+
+# Bon — le signal met à jour un état, _physics_process lit l'input
+func _on_detection_area_entered(area: Area2D) -> void:
+    if area.is_in_group("Marchand"):
+        is_nextToMarchand = true
+
+func _physics_process(delta):
+    if is_nextToMarchand and Input.is_action_just_pressed("interact"):
+        faire_quelque_chose()
+```
+
+---
+
+## 20. Bloquer le joueur avec un timer (pattern déclencheur)
+
+Pour bloquer le joueur pendant un délai (ex: animation d'interaction) sans désactiver le nœud :
+
+```gdscript
+var timerMarchand: float = 10       # durée du blocage en secondes
+var timerTriggerMarchand: bool = false  # true = doublage en cours
+
+func _physics_process(delta):
+    # ZONE A — timers (avant tout return, tournent toujours)
+    if timerTriggerMarchand:
+        timerMarchand -= delta
+        if timerMarchand <= 0:
+            Stats.ressources_doublees()
+            timerTriggerMarchand = false
+
+    # Bloque le mouvement pendant le doublage
+    if timerTriggerMarchand:
+        return
+
+    # ZONE B — mouvement (ignoré pendant le doublage)
+    ...
+
+    # Déclenche le doublage sur appui E
+    if is_nextToMarchand and Input.is_action_just_pressed("interact"):
+        timerTriggerMarchand = true
+```
+
+**Pourquoi deux `if timerTriggerMarchand` ?** Le premier décrémente et termine le timer. Le second bloque le mouvement — mais seulement si le timer tourne encore (il passe à `false` quand terminé).
+
+---
+
 ## Pièges connus
 
 - **`call_deferred()` dans `body_entered`** : instancier une scène directement dans un callback physique peut crasher — toujours différer.

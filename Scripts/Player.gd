@@ -35,7 +35,12 @@ var is_dashing: bool = false
 var facing: int = 1   # 1 = droite, -1 = gauche
 var is_attacking: bool = false
 @onready var collisionEpee = $Sword/CollisionShape2D
-@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D  # adapte si tu utilises AnimatedSprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+# --- Marchand ---
+var timerMarchand: float = 10          # délai d'attente avant que les ressources soient doublées (s)
+var is_nextToMarchand: bool = false    # true quand le joueur est dans la zone de détection du marchand
+var timerTriggerMarchand: bool = false # true quand le joueur a appuyé sur E et que le doublage est en cours
 
 func _ready() -> void:
 	sprite.animation_finished.connect(_on_anim_finished)
@@ -51,13 +56,22 @@ func _physics_process(delta: float) -> void:
 	coyote_timer -= delta
 	jump_buffer_timer -= delta
 	dash_cooldown_timer -= delta
+	# --- Doublage des ressources (marchand) ---
+	# Le timer tourne ici, avant tout return, pour ne jamais se figer
+	if timerTriggerMarchand:
+		timerMarchand -= delta
+		if timerMarchand <= 0:
+			Stats.ressources_doublees()
+			timerTriggerMarchand = false
 
-
+	# Bloque tout le mouvement pendant le doublage — les animations et le timer continuent
+	if timerTriggerMarchand:
+		return
+	
 	# Tant qu'on est au sol, on recharge le coyote time
 	if is_on_floor():
 		coyote_timer = coyote_time
 		#double_saut = true
-
 
 	# --- Lecture de la direction ---
 	var direction := Input.get_axis("move_left", "move_right")
@@ -67,7 +81,6 @@ func _physics_process(delta: float) -> void:
 		if sprite:
 			sprite.flip_h = facing < 0
 		
-	
 	# --- DASH ---
 	# Pendant un dash : vitesse fixe, pas de gravité, on ignore le reste.
 	if is_dashing:
@@ -82,7 +95,6 @@ func _physics_process(delta: float) -> void:
 		start_dash()
 		return
 
-
 	# --- Déplacement horizontal (accélération / friction) ---
 	if direction != 0:
 		var accel := acceleration if is_on_floor() else air_acceleration
@@ -90,17 +102,14 @@ func _physics_process(delta: float) -> void:
 	else:
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 		
-
 	# --- Gravité (asymétrique) ---
 	if not is_on_floor():
 		var g := gravity_up if velocity.y < 0 else gravity_down
 		velocity.y += g * delta
 
-
 	# --- Jump buffer : on mémorise l'appui ---
 	if Input.is_action_just_pressed("jump"):
 		jump_buffer_timer = jump_buffer_time
-
 
 	# --- Saut : possible si on a un appui en mémoire ET du coyote time ---
 	if jump_buffer_timer > 0 and coyote_timer > 0:
@@ -114,16 +123,13 @@ func _physics_process(delta: float) -> void:
 		velocity.y = jump_velocity
 		double_saut = false
 
-
 	# --- Saut variable : relâcher tôt = saut plus court ---
 	if Input.is_action_just_released("jump") and velocity.y < 0:
 		velocity.y *= jump_cut_multiplier
 		
-		
 	# --- Sword Attack ---
 	if Input.is_action_just_pressed("swordAttack") and not is_attacking:
 		sword_attack()
-
 
 	move_and_slide()
 	
@@ -139,13 +145,23 @@ func _physics_process(delta: float) -> void:
 	else:
 		sprite.play("idle")
 		
+		
+	# --- Interaction marchand ---
+	# Déclenche le doublage si le joueur est dans la zone et appuie sur E
+	if is_nextToMarchand:
+		if not Stats.ressources_deja_doublees and Input.is_action_just_pressed("interact"):
+			timerTriggerMarchand = true
+			$AnimatedSprite2D.play("RessourceToMarchand")
+		elif Stats.ressources_deja_doublees and Input.is_action_just_pressed("interact"):
+			print("Ressources déjà doublées !")
 
 func start_dash() -> void:
 	is_dashing = true
 	dash_timer = dash_duration
 	dash_cooldown_timer = dash_cooldown
 	velocity = Vector2(facing * dash_speed, 0.0)  # dash horizontal pur
-	
+
+#region attaque à l'épée
 func sword_attack() -> void:
 	is_attacking = true
 	collisionEpee.disabled = false
@@ -156,7 +172,8 @@ func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
 		body.takeDamageBoss(100)
 		print("LE BOSS PERDS 100 DE VIE")
-		
+#endregion
+
 func takeDamage(amount):
 	Stats.vie -= amount
 	Stats.vie_changee.emit(Stats.vie)
@@ -164,3 +181,13 @@ func takeDamage(amount):
 	print("Vie sur STATS : ", Stats.vie)
 	if Stats.vie <= 0:
 		Damage.SendPlayerDied()
+
+#region dectection avec le marchand
+func _on_detection_area_entered(area: Area2D) -> void:
+	if area.is_in_group("Marchand"):
+		is_nextToMarchand = true
+
+func _on_detection_area_exited(area: Area2D) -> void:
+	if area.is_in_group("Marchand"):
+		is_nextToMarchand = false
+#endregion
