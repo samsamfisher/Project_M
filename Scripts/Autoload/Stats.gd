@@ -2,7 +2,7 @@ extends Node
 
 @export var facteur_speed_jauge : float = 1
 var ressources: int = 0
-var vie: int = 3
+var viePlayer: int = 3
 var time : float = 0
 var ressources_deja_doublees: bool = false
 
@@ -19,7 +19,7 @@ func ajouter_ressource() -> void:
 
 func restart():
 	ressources = 0
-	vie = 3
+	viePlayer = 3
 	time = 0
 	ressources_deja_doublees = false
 	get_tree().paused = false

@@ -27,7 +27,7 @@ func _process(_delta: float) -> void:
 		spriteHandLeft.play("hand_idle")
 		spriteHandRight.play("hand_idle")
 	
-func takeDamageBoss(amount):
+func takeDamage(amount):
 	vieBoss -= amount
 	if vieBoss <= 0:
 		Damage.SendDied()
@@ -40,6 +40,7 @@ func _on_hand_collide_right_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
 		body.takeDamage(1)
 
+#region attack boss
 # --- Attaques Boss ---
 func attackBossHandLeft():
 	isAttacking = true
@@ -52,7 +53,9 @@ func attackBossHandRight():
 	collideHandRightAttack.disabled = false
 	spriteHandRight.play("hand_attack")
 	print("Right")
+#endregion
 
+#region anim finies
 # --- Animations finies ---
 func _on_body_animation_finished() -> void:
 	if spriteBody.animation == "death":
@@ -69,10 +72,13 @@ func _on_hand_right_animation_finished() -> void:
 		isAttacking = false
 		collideHandRightAttack.disabled = true
 		spriteHandRight.play("hand_idle")
+#endregion
 
+#region timer
 # --- Timer finis ---
 func _on_timer_attack_hand_left_timeout() -> void:
 	attackBossHandLeft()
 
 func _on_timer_attack_hand_right_timeout() -> void:
 	attackBossHandRight()
+#endregion

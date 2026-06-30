@@ -37,6 +37,9 @@ var is_attacking: bool = false
 @onready var collisionEpee = $Sword/CollisionShape2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
+var degatsBoss: float = 100
+var degatsEnnemies: int = 1
+
 # --- Marchand ---
 var timerMarchand: float = 10          # délai d'attente avant que les ressources soient doublées (s)
 var is_nextToMarchand: bool = false    # true quand le joueur est dans la zone de détection du marchand
@@ -168,24 +171,30 @@ func sword_attack() -> void:
 	sprite.play("attack_sword")
 	print("attack !")
 	
+# --- Détection attaque ---
 func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
-		body.takeDamageBoss(100)
-		print("LE BOSS PERDS 100 DE VIE")
+		body.takeDamage(degatsBoss)
+	elif body.is_in_group("EnemyPatrol"):
+		print(body)
+		body.takeDamage(degatsEnnemies)
+		print("ennemi Patrouilleur mange : ", degatsEnnemies)
 #endregion
 
 func takeDamage(amount):
-	Stats.vie -= amount
-	Stats.vie_changee.emit(Stats.vie)
-	print("Vie restantes : ", Stats.vie)
-	print("Vie sur STATS : ", Stats.vie)
-	if Stats.vie <= 0:
+	Stats.viePlayer -= amount
+	Stats.vie_changee.emit(Stats.viePlayer)
+	print("Vie restantes : ", Stats.viePlayer)
+	print("Vie sur STATS : ", Stats.viePlayer)
+	if Stats.viePlayer <= 0:
 		Damage.SendPlayerDied()
 
 #region dectection avec le marchand
 func _on_detection_area_entered(area: Area2D) -> void:
 	if area.is_in_group("Marchand"):
 		is_nextToMarchand = true
+	elif area.is_in_group("EnemyPatrol"):
+		takeDamage(degatsEnnemies)
 
 func _on_detection_area_exited(area: Area2D) -> void:
 	if area.is_in_group("Marchand"):

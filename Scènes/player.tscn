@@ -7,6 +7,7 @@
 [ext_resource type="Texture2D" uid="uid://cukxj34gb8w7r" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Idle.png" id="3_cucgj"]
 [ext_resource type="Texture2D" uid="uid://ccr5w4dqj2qvx" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Hit.png" id="4_3idgr"]
 [ext_resource type="Texture2D" uid="uid://dauk3qynpflnb" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Jump.png" id="4_anahk"]
+[ext_resource type="Texture2D" uid="uid://rfv8ab2oseur" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Death.png" id="4_ugyn4"]
 [ext_resource type="Texture2D" uid="uid://cqymdg0duwt4k" path="res://Sprite/Hero/DARK - Hero No Weapon/Platformer Hero-Run.png" id="5_3idgr"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_c544a"]
@@ -84,6 +85,46 @@ region = Rect2(632, 0, 79, 79)
 [sub_resource type="AtlasTexture" id="AtlasTexture_jl6gp"]
 atlas = ExtResource("2_anahk")
 region = Rect2(711, 0, 79, 79)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fkp0m"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(0, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_brkv8"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(64, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pkpdl"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(128, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ggyw2"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(192, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_neh25"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(256, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_payt7"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(320, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cx71d"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(384, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tm5vr"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(448, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g6ud2"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(512, 0, 64, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1jpmd"]
+atlas = ExtResource("4_ugyn4")
+region = Rect2(576, 0, 64, 64)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_ugyn4"]
 atlas = ExtResource("2_wss7u")
@@ -257,6 +298,41 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_fkp0m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_brkv8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pkpdl")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ggyw2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_neh25")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_payt7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cx71d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tm5vr")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g6ud2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1jpmd")
+}],
+"loop": 0,
+"name": &"death",
+"speed": 10.0
+}, {
+"frames": [{
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_ugyn4")
 }, {
 "duration": 1.0,
@@ -384,9 +460,7 @@ shape = SubResource("CapsuleShape2D_c544a")
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=443572277]
 position = Vector2(10, 13)
 sprite_frames = SubResource("SpriteFrames_caakp")
-animation = &"RessourceToMarchand"
-frame = 7
-frame_progress = 1.0
+animation = &"death"
 offset = Vector2(-8, -12)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1939019897]
@@ -395,7 +469,7 @@ position_smoothing_enabled = true
 
 [node name="Sword" type="Area2D" parent="." unique_id=992975078]
 collision_layer = 4
-collision_mask = 2
+collision_mask = 34
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Sword" unique_id=1764807038]
 position = Vector2(22.5, 3.0000002)
@@ -403,12 +477,13 @@ rotation = -1.5753844
 shape = SubResource("CapsuleShape2D_jpc5c")
 
 [node name="Detection" type="Area2D" parent="." unique_id=1788486836]
-collision_mask = 64
+collision_mask = 96
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Detection" unique_id=75935367]
 shape = SubResource("CapsuleShape2D_2iv3x")
 
 [connection signal="animation_finished" from="AnimatedSprite2D" to="." method="_on_animated_sprite_2d_animation_finished"]
+[connection signal="area_entered" from="Sword" to="." method="_on_sword_area_entered"]
 [connection signal="body_entered" from="Sword" to="." method="_on_sword_body_entered"]
 [connection signal="area_entered" from="Detection" to="." method="_on_detection_area_entered"]
 [connection signal="area_exited" from="Detection" to="." method="_on_detection_area_exited"]

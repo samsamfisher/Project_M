@@ -2,6 +2,10 @@ extends Node
 
 signal died
 signal playerDied
+signal ennemiesDied
+
+func SendDiedEnnemies():
+	print("Ennemy died")
 
 func SendDied():
 	died.emit()

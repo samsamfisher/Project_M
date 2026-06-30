@@ -36,6 +36,7 @@ window/stretch/mode="viewport"
 Player="Groupe du Player"
 Boss=""
 Marchand=""
+EnemyPatrol=""
 
 [input]
 

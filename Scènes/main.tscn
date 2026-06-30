@@ -45,7 +45,7 @@ position = Vector2(17156, 676)
 [node name="GameOver" parent="." unique_id=1636614842 instance=ExtResource("7_us3xc")]
 
 [node name="EnemyPatrol" parent="." unique_id=97726162 node_paths=PackedStringArray("marker2D1", "marker2D2") instance=ExtResource("7_2f0x7")]
-position = Vector2(253, 832)
+position = Vector2(2375, 818)
 marker2D1 = NodePath("../PatrolPoint1")
 marker2D2 = NodePath("../PatrolPoint2")
 
@@ -56,7 +56,7 @@ position = Vector2(2105, 817)
 position = Vector2(2766, 820)
 
 [node name="Player" parent="." unique_id=557671400 instance=ExtResource("1_mijtf")]
-position = Vector2(-1186, 810)
+position = Vector2(2174, 818)
 
 [node name="Ressources2" parent="." unique_id=1262155479 instance=ExtResource("3_ahwsu")]
 position = Vector2(-1064, 825)
