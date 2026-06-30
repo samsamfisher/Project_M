@@ -37,8 +37,8 @@ var is_attacking: bool = false
 @onready var collisionEpee = $Sword/CollisionShape2D
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 
-var degatsBoss: float = 100
-var degatsEnnemies: int = 1
+var degatsForBoss: float = 100
+var degatsForSmallsEnnemies: int = 1
 
 # --- Marchand ---
 var timerMarchand: float = 10          # délai d'attente avant que les ressources soient doublées (s)
@@ -174,11 +174,11 @@ func sword_attack() -> void:
 # --- Détection attaque ---
 func _on_sword_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Boss"):
-		body.takeDamage(degatsBoss)
+		body.takeDamage(degatsForBoss)
 	elif body.is_in_group("EnemyPatrol"):
 		print(body)
-		body.takeDamage(degatsEnnemies)
-		print("ennemi Patrouilleur mange : ", degatsEnnemies)
+		body.takeDamage(degatsForSmallsEnnemies)
+		print("ennemi Patrouilleur mange : ", degatsForSmallsEnnemies)
 #endregion
 
 func takeDamage(amount):
@@ -194,7 +194,7 @@ func _on_detection_area_entered(area: Area2D) -> void:
 	if area.is_in_group("Marchand"):
 		is_nextToMarchand = true
 	elif area.is_in_group("EnemyPatrol"):
-		takeDamage(degatsEnnemies)
+		takeDamage(degatsForSmallsEnnemies)
 
 func _on_detection_area_exited(area: Area2D) -> void:
 	if area.is_in_group("Marchand"):

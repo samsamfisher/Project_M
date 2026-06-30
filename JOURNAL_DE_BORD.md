@@ -700,4 +700,148 @@ func takeDamage(amount):
 - **Hitbox toujours active** → si on oublie de la désactiver après l'attaque, la main tue le joueur en continu au contact.
 - **`isAttacking` partagé entre les deux mains** → les deux timers peuvent se déclencher simultanément, les deux mains attaquent en même temps. À garder en tête si on veut les rendre exclusives plus tard.
 
+---
+
+## Sprint — Écran game over (boutons Restart / Quit / Menu)
+**Branche :** `main` (puis correctifs directs) · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+L'écran de game over a maintenant des boutons qui répondent vraiment : **Quit** ferme le jeu, **Restart** relance le niveau proprement (vie, ressources et temps remis à zéro), **MainMenu** laissé en attente (pas de vrai menu principal pour l'instant).
+
+### 🔧 Comment ça marche
+
+**1. Le piège des boutons qui ne répondent pas du tout.** En `Inherit` (réglage par défaut), un nœud se fige dès que `get_tree().paused = true` est appelé — y compris ses boutons. Solution : sur le **nœud racine de l'UI de game over**, passer `Process Mode` sur **`When Paused`**. Les enfants héritent automatiquement.
+
+```gdscript
+# Process Mode du parent de l'UI de pause/game over → When Paused (pas Always)
+# Always tournerait aussi en jeu normal = risque d'effets de bord inutiles
+```
+
+**2. Le restart qui laisse le perso figé.** `get_tree().reload_current_scene()` recrée bien la scène, mais les **Autoloads survivent** au rechargement — leurs variables ne se remettent pas à zéro toutes seules. `Damage.paused` restait à `true`, donc le joueur restait gelé après le restart.
+
+**Fix : centraliser un `restart()` dans l'Autoload qui porte l'état du jeu (`Stats`).**
+
+```gdscript
+# Stats.gd
+func restart():
+    ressources = 0
+    vie = 3
+    time = 0
+    get_tree().paused = false
+    get_tree().reload_current_scene()
+```
+
+Pas besoin de réémettre les signaux (`vie_changee`, etc.) dans `restart()` : `reload_current_scene()` recrée tous les nœuds HUD depuis zéro, et leur `_ready()` relit directement les variables de `Stats`.
+
+### 🏷️ Concepts / mots-clés
+`Process Mode` (`Inherit` / `Always` / `When Paused`) · `get_tree().paused` · `reload_current_scene()` · Autoloads persistants entre scènes · `restart()` centralisé · signaux inutiles au reload
+
+### 🪤 Pièges / à surveiller
+- **Boutons muets en pause** → toujours vérifier le `Process Mode` du parent de l'UI avant de chercher ailleurs (signal mal connecté, collision qui bloque…).
+- **Autoloads = état qui survit au reload.** Tout autoload qui porte de l'état doit avoir un moyen de le remettre à zéro, sinon le restart laisse des résidus invisibles.
+- **`git push` sur une branche neuve** → `fatal: no upstream branch`. Normal la première fois : `git push --set-upstream origin <branche>`. Pour ne plus y penser : `git config --global push.autoSetupRemote true`.
+
+---
+
+## Sprint — Coffre / marchand avant le boss
+**Branche :** `feat/coffre-avant-boss` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+Un marchand posé avant la zone du boss : si le joueur s'arrête et appuie sur **E**, ses ressources sont doublées après un court délai — mais s'arrêter coûte du temps, donc fait gonfler la vie du boss. Premier vrai choix risque/récompense du jeu.
+
+### 🔧 Comment ça marche
+
+**1. Détecter une `Area2D` avec une autre `Area2D`.** `body_entered` ne voit que les corps physiques (`CharacterBody2D`...). Pour qu'une zone de détection du joueur voie la zone du marchand, il faut **`area_entered`**.
+
+```gdscript
+func _on_detection_area_entered(area: Area2D) -> void:
+    if area.is_in_group("Marchand"):
+        is_nextToMarchand = true
+```
+
+**2. Le groupe va sur le nœud que le signal tend.** `area_entered(area)` tend l'**`Area2D`** elle-même — donc le groupe `"Marchand"` doit être sur l'`Area2D`, pas sur son parent `Node2D`. Piège classé déjà croisé avec le boss (sprint *épée touche le boss*), mais qui revient à chaque nouvelle interaction.
+
+**3. `Input.is_action_just_pressed` dans un signal ne marche presque jamais.** Il ne reste vrai qu'**une frame**. Le mettre dans `body_entered`/`area_entered` revient à parier que le joueur appuie sur E exactement à la frame où il entre dans la zone. **Toujours lire les inputs dans `_process`/`_physics_process`**, le signal se contente de poser un état (booléen).
+
+```gdscript
+# le signal pose l'état
+func _on_detection_area_entered(area):
+    if area.is_in_group("Marchand"):
+        is_nextToMarchand = true
+
+# _physics_process lit l'input, chaque frame
+if is_nextToMarchand and Input.is_action_just_pressed("interact"):
+    timerTriggerMarchand = true
+```
+
+**4. Bloquer le joueur pendant un délai sans figer le timer.** `_physics_process` s'exécute de haut en bas, un `return` coupe tout ce qui suit. Astuce : placer le décompte du timer **avant** le `return`, et le `return` **avant** le bloc mouvement.
+
+```gdscript
+# Zone A — timers, toujours exécutés
+if timerTriggerMarchand:
+    timerMarchand -= delta
+    if timerMarchand <= 0:
+        Stats.ressources_doublees()
+        timerTriggerMarchand = false
+
+if timerTriggerMarchand:
+    return   # le mouvement (zone B) est ignoré, le timer continue de tourner
+
+# Zone B — mouvement, animations...
+```
+
+### 🏷️ Concepts / mots-clés
+`area_entered` vs `body_entered` · groupe sur le nœud que le signal tend · `is_action_just_pressed` hors signal · pattern booléen déclencheur + timer manuel · ordre d'exécution de `_physics_process` · `return` anticipé
+
+### 🪤 Pièges / à surveiller
+- **Layers/masks** des deux `Area2D` doivent se recouvrir, sinon la détection ne se déclenche jamais malgré un code correct.
+- **`ColorRect` plein écran suspecté de bloquer les clics** : piste explorée mais **non confirmée** sur ce projet — le vrai coupable était le `Process Mode`. À vérifier au cas par cas si le souci se représente.
+- **Variable de délai mal placée** : si `timerMarchand <= 0` est testé à l'intérieur du `if Input.is_action_just_pressed(...)`, il ne se vérifie qu'à l'instant de l'appui (donc presque jamais vrai). Il doit être testé juste après le décompte, indépendamment de l'input.
+
+---
+
+## Sprint — Ennemi patrouilleur : attaque et mort
+**Branche :** `feat/enemy-patrol` · **Statut :** ✅
+
+### 🎯 Ce qu'on a fait
+L'ennemi patrouilleur peut maintenant être tué par l'épée du joueur (avec une vraie animation de mort), et inflige des dégâts au joueur au contact.
+
+### 🔧 Comment ça marche
+
+**1. Vie et mort de l'ennemi — même pattern que le boss.**
+
+```gdscript
+# enemy_patrol.gd
+var vieEnemyPatrol: int = 3
+
+func takeDamage(amount):
+    vieEnemyPatrol -= amount
+    if vieEnemyPatrol <= 0:
+        Damage.SendDiedEnnemies()
+
+func _physics_process(delta):
+    if vieEnemyPatrol <= 0:
+        sprite.play("die")
+        return   # fige l'ennemi pendant l'animation de mort
+    ...
+
+func _on_animated_sprite_2d_animation_finished() -> void:
+    if sprite.animation == "die":
+        queue_free()
+```
+
+**2. Détection par l'épée** — même logique que pour le boss : `_on_sword_body_entered` vérifie le groupe et applique les dégâts.
+
+**3. Dégâts au contact (l'ennemi attaque le joueur)** — réutilise la zone `Detection` du joueur (celle qui sert aussi au marchand) : si l'`Area2D` détectée est dans le groupe `EnemyPatrol`, le joueur prend des dégâts directement.
+
+### 🏷️ Concepts / mots-clés
+`vieEnemyPatrol` · pattern `takeDamage` réutilisé (boss → ennemi) · animation de mort + `queue_free()` différé à la fin de l'anim · zone de détection partagée (marchand + ennemi)
+
+### 🪤 Pièges / à surveiller
+- **Une seule variable pour deux sens de dégâts** : `degatsEnnemies` servait à la fois pour « dégâts que le joueur inflige à l'ennemi » et « dégâts que l'ennemi inflige au joueur ». Ça marche tant que les deux valent la même chose par coïncidence, mais casse dès qu'on veut les différencier. **À surveiller : nommer clairement le sens des dégâts dès qu'un deuxième type d'ennemi arrive.**
+- **Piste de refonte notée (pas encore d'actualité) :** un système de dégâts centralisé (type d'ennemi, type de dégâts, émetteur/receveur) plutôt que des variables éparpillées partout — pertinent dès qu'il y a 2-3 types d'ennemis, prématuré avant.
+- **Signal déclaré mais jamais émis :** `Damage.ennemiesDied` existe en déclaration mais `SendDiedEnnemies()` ne l'émet pas (contrairement à `SendDied()` / `SendPlayerDied()` qui suivent tous les deux le même schéma signal + pause). Pas bloquant tant que rien ne l'écoute, mais incohérent avec le reste du bus `Damage`.
+
+---
+
 > _Prochaine entrée à écrire à la fin du prochain mini-sprint._
